@@ -1,0 +1,10 @@
+flask
+flask-cors
+pymongo
+pillow
+requests
+python-dotenv
+pytesseract
+opencv-python
+numpy
+dotenv

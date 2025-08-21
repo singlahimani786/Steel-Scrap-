@@ -3,10 +3,11 @@ import { withAuth } from "next-auth/middleware";
 
 export default withAuth({
   pages: {
-    signIn: "/login", // Redirect if not signed in
+    signIn: "/login",
   },
 });
 
 export const config = {
-  matcher: ["/((?!api|_next|static|favicon.ico).*)"], // matches everything except static/API
+  // Protect dashboard only; allow marketing pages unauthenticated
+  matcher: ["/dashboard/:path*"],
 };

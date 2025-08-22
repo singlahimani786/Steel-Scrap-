@@ -54,11 +54,11 @@ export default function AdminDashboard() {
         axios.get("http://localhost:5001/admin/stats")
       ]);
       
-      if (ownersResponse.data.status === "success") {
+      if ((ownersResponse.data as any).status === "success") {
         setOwners((ownersResponse.data as any).owners);
       }
       
-      if (statsResponse.data.status === "success") {
+      if ((statsResponse.data as any).status === "success") {
         setStats((statsResponse.data as any).stats);
       }
     } catch (error) {

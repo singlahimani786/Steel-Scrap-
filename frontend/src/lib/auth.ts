@@ -44,7 +44,7 @@ export const authOptions: NextAuthOptions = {
           const ok = await bcrypt.compare(password, user.password || "");
           if (!ok) return null;
           if (requestedRole && requestedRole !== user.role) return null;
-          return { id: user._id.toString(), email: user.email, role: user.role } as any;
+          return { id: String(user._id), email: user.email, role: user.role } as any;
         } catch (e) {
           return null;
         }

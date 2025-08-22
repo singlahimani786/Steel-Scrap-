@@ -39,8 +39,9 @@ export default function PendingSubmissions({
   const fetchPendingSubmissions = async () => {
     try {
       setLoading(true);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
       const response = await fetch(
-        `http://localhost:5001/labourer/pending-submissions?labourer_id=${labourerId}`
+        `${backendUrl}/labourer/pending-submissions?labourer_id=${labourerId}`
       );
       const data = await response.json();
       
@@ -62,7 +63,8 @@ export default function PendingSubmissions({
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/analysis/${submissionId}`, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/analysis/${submissionId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

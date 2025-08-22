@@ -54,7 +54,8 @@ export default function PendingVerifications({
   const fetchVerifications = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5001/owner/pending-verifications?factory_id=${factoryId}`);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/owner/pending-verifications?factory_id=${factoryId}`);
       const data = await response.json();
       
       if (data.status === 'success') {
@@ -147,7 +148,8 @@ export default function PendingVerifications({
         verificationData.corrected_plate_predictions = editedPlatePredictions;
       }
 
-      const response = await fetch('http://localhost:5001/owner/verify-analysis', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/owner/verify-analysis`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

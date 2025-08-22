@@ -74,7 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string, role: 'admin' | 'owner' | 'labourer'): Promise<{ success: boolean; message?: string }> => {
     try {
-      const response = await axios.post<AuthResponse>('http://localhost:5001/auth/login', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.post<AuthResponse>(`${backendUrl}/auth/login`, {
         email,
         password,
         role
@@ -128,7 +129,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (email: string, password: string, role: 'admin' | 'owner' | 'labourer'): Promise<{ success: boolean; message?: string }> => {
     try {
-      const response = await axios.post<AuthResponse>('http://localhost:5001/auth/register', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.post<AuthResponse>(`${backendUrl}/auth/register`, {
         email,
         password,
         role

@@ -68,12 +68,13 @@ export default function OwnerDashboard() {
       console.error("No factory ID available");
       return;
     }
-
+    
     try {
       setLoading(true);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
       const [labourersResponse, statsResponse] = await Promise.all([
-        axios.get(`http://localhost:5001/owner/labourers?factory_id=${user.factory_id}`),
-        axios.get(`http://localhost:5001/owner/stats?factory_id=${user.factory_id}`)
+        axios.get(`${backendUrl}/owner/labourers?factory_id=${user.factory_id}`),
+        axios.get(`${backendUrl}/owner/stats?factory_id=${user.factory_id}`)
       ]);
       
       if ((labourersResponse.data as any).status === "success") {
@@ -96,7 +97,8 @@ export default function OwnerDashboard() {
     try {
       setLoadingAnalytics(true);
       setTimeRange(range);
-      const response = await axios.get(`http://localhost:5001/owner/analytics?factory_id=${user.factory_id}&time_range=${range}`);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.get(`${backendUrl}/owner/analytics?factory_id=${user.factory_id}&time_range=${range}`);
       
       if ((response.data as any).status === "success") {
         setAnalyticsData((response.data as any).data);
@@ -114,7 +116,8 @@ export default function OwnerDashboard() {
     try {
       setLoadingHistory(true);
       setCurrentPage(page);
-      const response = await axios.get(`http://localhost:5001/owner/history?factory_id=${user.factory_id}&page=${page}`);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.get(`${backendUrl}/owner/history?factory_id=${user.factory_id}&page=${page}`);
       
       if ((response.data as any).status === "success") {
         setHistoryData(response.data as any);
@@ -133,7 +136,8 @@ export default function OwnerDashboard() {
 
     try {
       setDeletingAnalysisId(analysisId);
-      const response = await fetch(`http://localhost:5001/analysis/${analysisId}`, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/analysis/${analysisId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +176,8 @@ export default function OwnerDashboard() {
         factory_id: user.factory_id
       };
       
-      const response = await axios.post("http://localhost:5001/owner/create-labourer", labourerData);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.post(`${backendUrl}/owner/create-labourer`, labourerData);
       if ((response.data as any).status === "success") {
         setShowCreateForm(false);
         setFormData({
@@ -194,15 +199,29 @@ export default function OwnerDashboard() {
     }
     
     try {
-      const response = await axios.patch(`http://localhost:5001/owner/labourers/${labourerId}/status`, {
-        is_active: !currentStatus,
-        factory_id: user.factory_id
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/owner/labourers/${labourerId}/toggle-status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          is_active: !currentStatus,
+          factory_id: user.factory_id
+        }),
       });
-      if ((response.data as any).status === "success") {
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        alert('Labourer status updated successfully');
         fetchData(); // Refresh data
+      } else {
+        throw new Error(data.message);
       }
     } catch (error) {
-      console.error("Failed to toggle status:", error);
+      console.error('Failed to toggle labourer status:', error);
+      alert('Failed to update labourer status. Please try again.');
     }
   };
 

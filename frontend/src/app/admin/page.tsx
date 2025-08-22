@@ -49,9 +49,10 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
       const [ownersResponse, statsResponse] = await Promise.all([
-        axios.get("http://localhost:5001/admin/owners"),
-        axios.get("http://localhost:5001/admin/stats")
+        axios.get(`${backendUrl}/admin/owners`),
+        axios.get(`${backendUrl}/admin/stats`)
       ]);
       
       if ((ownersResponse.data as any).status === "success") {
@@ -71,7 +72,8 @@ export default function AdminDashboard() {
   const handleCreateOwner = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5001/admin/create-owner", formData);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.post(`${backendUrl}/admin/create-owner`, formData);
       if ((response.data as any).status === "success") {
         setShowCreateForm(false);
         setFormData({
@@ -88,7 +90,8 @@ export default function AdminDashboard() {
 
   const toggleOwnerStatus = async (ownerId: string, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:5001/admin/owners/${ownerId}/status`, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.patch(`${backendUrl}/admin/owners/${ownerId}/status`, {
         is_active: !currentStatus
       });
       if ((response.data as any).status === "success") {

@@ -27,7 +27,8 @@ export default function SubmissionDetails({
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-      const response = await fetch('http://localhost:5001/labourer/submit-analysis', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/labourer/submit-analysis`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

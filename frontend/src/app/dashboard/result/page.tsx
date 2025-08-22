@@ -4,11 +4,16 @@ import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recha
 import React, { Suspense } from 'react';
 import Link from 'next/link';
 import ProtectedRoute from '@/components/protected-route';
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
 
 const COLORS = ['#00C49F', '#FF8042', '#0088FE', '#FFBB28'];
 
 function PredictionDashboardContent() {
+  const { user } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
   const plate = searchParams.get('plate');
   const rawResult = searchParams.get('result');
@@ -109,7 +114,7 @@ function PredictionDashboardContent() {
             <h2 className="text-xl font-semibold mb-2">🖼️ Scrap Image</h2>
             <div className="text-sm text-gray-500 mb-2">Image: {scrapImage}</div>
             <img
-              src={`http://localhost:5001/static/${scrapImage}`}
+              src={`${backendUrl}/static/${scrapImage}`}
               alt="Uploaded Scrap"
               className="rounded max-h-64 object-contain border"
               onError={(e) => {
@@ -170,7 +175,7 @@ function PredictionDashboardContent() {
   );
 }
 
-export default function PredictionDashboard() {
+export default function ResultPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">

@@ -131,51 +131,46 @@ export default function AnalyticsPage() {
   useEffect(() => {
     // Admin can always fetch data, others need factory_id
     if (user?.role === 'admin' || user?.factory_id) {
-      fetchData();
+      fetchData(range);
     } else if (user && user.role === 'owner' || user?.role === 'labourer') {
       // For non-admin users without factory_id, show loading state
       console.log("Waiting for factory_id for user:", user);
     }
   }, [user, range]);
 
-  const fetchData = async () => {
-    // Admin can always fetch data, others need factory_id
-    if (user?.role !== 'admin' && !user?.factory_id) {
-      console.error("No factory ID available");
-      return;
-    }
-
+  const fetchData = async (range: Range) => {
     try {
       setLoading(true);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
       
       // Fetch scrap type details
-      const typesResponse = await axios.get("http://localhost:5001/scrap-types");
+      const typesResponse = await axios.get(`${backendUrl}/scrap-types`);
       const typesData = typesResponse.data as { status: string; scrap_types: ScrapTypeDetails[] };
       console.log("Scrap types response:", typesData);
       if (typesData.status === 'success') {
         setScrapTypeDetails(typesData.scrap_types);
       }
       
-              // Fetch analytics data with factory filtering (admin sees all, others see their factory only)
-        const analyticsUrl = user.role === 'admin' 
-          ? `http://localhost:5001/analytics?range=${range}`
-          : `http://localhost:5001/analytics?range=${range}&factory_id=${user.factory_id}`;
+      // Fetch analytics data with factory filtering (admin sees all, others see their factory only)
+      const analyticsUrl = user && user.role === 'owner' && user.factory_id
+        ? `${backendUrl}/analytics?range=${range}&factory_id=${user.factory_id}`
+        : `${backendUrl}/analytics?range=${range}`;
         
-        console.log(`🔍 Fetching analytics from: ${analyticsUrl}`);
-        console.log(`👤 User role: ${user.role}, Factory ID: ${user.factory_id || 'None'}`);
-        
-        const analyticsResponse = await axios.get(analyticsUrl);
-        const analyticsResponseData = analyticsResponse.data as { status: string; data: AnalyticsData };
-        console.log("Analytics response:", analyticsResponseData);
-        if (analyticsResponseData.status === 'success') {
-          setAnalyticsData(analyticsResponseData.data);
-          console.log(`📊 Analytics data loaded: ${analyticsResponseData.data.total_records} records`);
-        }
+      console.log(`🔍 Fetching analytics from: ${analyticsUrl}`);
+      console.log(`👤 User role: ${user?.role}, Factory ID: ${user?.factory_id || 'None'}`);
       
-      // Fetch history data with factory filtering (admin sees all, others see their factory only)
-      const historyUrl = user.role === 'admin'
-        ? `http://localhost:5001/history`
-        : `http://localhost:5001/history?factory_id=${user.factory_id}`;
+      const analyticsResponse = await axios.get(analyticsUrl);
+      const analyticsResponseData = analyticsResponse.data as { status: string; data: AnalyticsData };
+      console.log("Analytics response:", analyticsResponseData);
+      if (analyticsResponseData.status === 'success') {
+        setAnalyticsData(analyticsResponseData.data);
+        console.log(`📊 Analytics data loaded: ${analyticsResponseData.data.total_records} records`);
+      }
+      
+      // Fetch history data for filtering
+      const historyUrl = user && user.role === 'admin' 
+        ? `${backendUrl}/history`
+        : `${backendUrl}/history?factory_id=${user?.factory_id}`;
       
       const historyResponse = await axios.get(historyUrl);
       const historyData = historyResponse.data as { status: string; history: AnalysisRecord[] };

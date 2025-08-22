@@ -44,22 +44,17 @@ export default function Dashboard() {
 
   const fetchHistory = async () => {
     try {
+      setLoading(true);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
       let response;
-      
-      // Use factory-specific endpoint for owners, general endpoint for admins
-      if (user?.role === 'owner' && user?.factory_id) {
-        response = await axios.get(`http://localhost:5001/owner/history?factory_id=${user.factory_id}`);
-        const data = response.data as { status: string; data: AnalysisRecord[] };
-        if (data.status === "success") {
-          setHistoryData(data.data);
-        }
+      if (user?.role === 'owner') {
+        response = await axios.get(`${backendUrl}/owner/history?factory_id=${user.factory_id}`);
       } else {
-        // Admin sees all data
-        response = await axios.get("http://localhost:5001/history");
-        const data = response.data as { status: string; history: AnalysisRecord[] };
-        if (data.status === "success") {
-          setHistoryData(data.history);
-        }
+        response = await axios.get(`${backendUrl}/history`);
+      }
+      const data = response.data as { status: string; data: AnalysisRecord[] };
+      if (data.status === "success") {
+        setHistoryData(data.data);
       }
     } catch (error) {
       console.error("Failed to fetch history", error);
@@ -70,25 +65,22 @@ export default function Dashboard() {
 
   const fetchAnalytics = async () => {
     try {
+      setLoading(true);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
       let response;
-      
-      // Use factory-specific endpoint for owners, general endpoint for admins
-      if (user?.role === 'owner' && user?.factory_id) {
-        response = await axios.get(`http://localhost:5001/owner/analytics?factory_id=${user.factory_id}&time_range=${timeRange}`);
-        const data = response.data as { status: string; data: any };
-        if (data.status === "success") {
-          setAnalyticsData(data.data);
-        }
+      if (user?.role === 'owner') {
+        response = await axios.get(`${backendUrl}/owner/analytics?factory_id=${user.factory_id}&time_range=${timeRange}`);
       } else {
-        // Admin sees all data
-        response = await axios.get(`http://localhost:5001/analytics?time_range=${timeRange}`);
-        const data = response.data as { status: string; data: any };
-        if (data.status === "success") {
-          setAnalyticsData(data.data);
-        }
+        response = await axios.get(`${backendUrl}/analytics?time_range=${timeRange}`);
+      }
+      const data = response.data as { status: string; data: any };
+      if (data.status === "success") {
+        setAnalyticsData(data.data);
       }
     } catch (error) {
       console.error("Failed to fetch analytics", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,7 +151,8 @@ export default function Dashboard() {
     }
 
     try {
-      const response: any = await axios.post("http://localhost:5001/upload", formData, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response: any = await axios.post(`${backendUrl}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       

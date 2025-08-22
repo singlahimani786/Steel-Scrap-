@@ -53,7 +53,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const verifySession = async (token: string) => {
     try {
-      const response = await axios.post<AuthResponse>('http://localhost:5001/auth/verify', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await axios.post<AuthResponse>(`${backendUrl}/auth/verify`, {
         session_token: token
       });
       

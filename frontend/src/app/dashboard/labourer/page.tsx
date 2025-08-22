@@ -36,7 +36,7 @@ const router = useRouter();
 
     try {
       setUploading(true);
-      setAnalysisStage('Preparing images...');
+      setAnalysisStage('Preparing image for analysis...');
       
       const formData = new FormData();
       formData.append("truck_image", scrapImage);
@@ -48,7 +48,8 @@ const router = useRouter();
       await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay for UX
 
       setAnalysisStage('Running AI analysis...');
-      const response = await fetch("http://localhost:5001/upload", {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/upload`, {
         method: "POST",
         body: formData,
       });

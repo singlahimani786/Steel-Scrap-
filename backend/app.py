@@ -18,6 +18,7 @@ app = Flask(__name__)
 # Configure CORS for Vercel deployment + ngrok
 CORS(app, origins=[
     "http://localhost:3000",  # Local development
+    "https://scrap-identification-system.vercel.app",  # Your specific Vercel domain
     "https://*.vercel.app",   # Vercel domains
     "https://*.ngrok.io",     # ngrok tunnels
     "https://*.ngrok-free.app" # ngrok free tier

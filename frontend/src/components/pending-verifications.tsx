@@ -223,7 +223,7 @@ export default function PendingVerifications({
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Scrap:</p>
                     <img
-                      src={`http://localhost:5001/static/${verification.scrap_image}`}
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/static/${verification.scrap_image}`}
                       alt="Scrap preview"
                       className="w-full h-20 object-cover rounded border border-gray-200"
                       onError={(e) => {
@@ -237,7 +237,7 @@ export default function PendingVerifications({
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Truck Plate:</p>
                     <img
-                      src={`http://localhost:5001/static/${verification.plate_image}`}
+                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/static/${verification.plate_image}`}
                       alt="Plate preview"
                       className="w-full h-16 object-cover rounded border border-gray-200"
                       onError={(e) => {
@@ -374,7 +374,7 @@ export default function PendingVerifications({
                         <h5 className="font-medium text-sm mb-2">Scrap Image:</h5>
                         <div className="border border-gray-200 rounded-lg overflow-hidden">
                           <img
-                            src={`http://localhost:5001/static/${selectedVerification.scrap_image}`}
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/static/${selectedVerification.scrap_image}`}
                             alt="Scrap analysis"
                             className="w-full h-48 object-cover"
                             onError={(e) => {
@@ -393,7 +393,7 @@ export default function PendingVerifications({
                         <h5 className="font-medium text-sm mb-2">Truck Plate Image:</h5>
                         <div className="border border-gray-200 rounded-lg overflow-hidden">
                           <img
-                            src={`http://localhost:5001/static/${selectedVerification.plate_image}`}
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/static/${selectedVerification.plate_image}`}
                             alt="Truck plate"
                             className="w-full h-32 object-cover"
                             onError={(e) => {

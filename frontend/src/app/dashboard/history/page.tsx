@@ -54,9 +54,10 @@ export default function HistoryPage() {
     }
     try {
       setLoading(true);
-      const url = user?.role === 'admin' 
-        ? "http://localhost:5001/history"
-        : `http://localhost:5001/history?factory_id=${user.factory_id}`;
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const url = user?.role === 'owner' && user?.factory_id
+        ? `${backendUrl}/history?factory_id=${user.factory_id}`
+        : `${backendUrl}/history`;
       
       const response = await axios.get(url);
       const data = response.data as { status: string; history: AnalysisRecord[] };

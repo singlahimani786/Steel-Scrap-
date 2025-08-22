@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from datetime import datetime, timedelta
 import hashlib
@@ -42,6 +42,14 @@ except Exception as e:
 
 # Create static folder for image uploads
 os.makedirs("static", exist_ok=True)
+
+@app.route('/static/<filename>')
+def serve_static_file(filename):
+    """Serve static files (images)"""
+    try:
+        return send_from_directory('static', filename)
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
 
 # Mock data for testing when MongoDB is not available
 MOCK_HISTORY = [
@@ -323,11 +331,16 @@ def upload():
         # Extract form data FIRST before accessing files
         current_factory_id = request.form.get('factory_id')
         current_owner_id = request.form.get('owner_id')
+        current_labourer_id = request.form.get('labourer_id')
+        analysis_notes = request.form.get('notes', '')
+        auto_submit = request.form.get('auto_submit', 'false').lower() == 'true'
         
         # Debug logging for form data
         print(f"🔍 Form data extracted:")
         print(f"   factory_id: {current_factory_id}")
         print(f"   owner_id: {current_owner_id}")
+        print(f"   labourer_id: {current_labourer_id}")
+        print(f"   auto_submit: {auto_submit}")
         print(f"   All form keys: {list(request.form.keys())}")
         
         # Now access files
@@ -373,7 +386,7 @@ def upload():
                 else:
                     # Save to analysis history collection with IST time
                     try:
-                        result = analysis_history_collection.insert_one({
+                        analysis_data = {
                             "timestamp": ist_time,
                             "truck_number": plate_number,
                             "truck_id": truck_id,
@@ -383,9 +396,35 @@ def upload():
                             "plate_predictions": plate_result,
                             "analysis_id": str(scrap_record.inserted_id),
                             "factory_id": current_factory_id,
-                            "owner_id": current_owner_id
+                            "owner_id": current_owner_id,
+                            "submitted_to_owner": False,
+                            "status": "pending"
+                        }
+
+                        # Add labourer information if available
+                        if current_labourer_id:
+                            analysis_data.update({
+                                "labourer_id": current_labourer_id,
+                                "labourer_notes": analysis_notes,
+                                "submitted_to_owner": auto_submit,
+                                "status": "submitted" if auto_submit else "pending",
+                                "submission_timestamp": ist_time if auto_submit else None
+                            })
+
+                        result = analysis_history_collection.insert_one(analysis_data)
+                        analysis_id = str(result.inserted_id)
+                        print(f"✅ Analysis history saved for factory: {current_factory_id}, record ID: {analysis_id}")
+                        
+                        # Return the analysis ID in the response
+                        return jsonify({
+                            "status": "success",
+                            "plate_number": plate_number,
+                            "scrap_result": scrap_result,
+                            "timestamp": ist_time.isoformat(),
+                            "scrap_image": scrap_image.filename,
+                            "analysis_id": analysis_id,
+                            "_id": analysis_id
                         })
-                        print(f"✅ Analysis history saved for factory: {current_factory_id}, record ID: {result.inserted_id}")
                     except Exception as save_error:
                         print(f"❌ Failed to save analysis history: {save_error}")
                         print(f"   Collection: {analysis_history_collection.name}")
@@ -424,35 +463,78 @@ def get_history():
     try:
         # Get factory_id from query params
         factory_id = request.args.get('factory_id')
+        print(f"Received history request for factory_id: {factory_id}")
         
-        if MONGODB_AVAILABLE:
-            # Build query filter
-            query_filter = {}
-            if factory_id:
-                query_filter["factory_id"] = factory_id
-                print(f"🏭 Filtering history for factory: {factory_id}")
-            
-            # Get analysis history with factory filter, sorted by timestamp (newest first)
-            history = list(analysis_history_collection.find(query_filter).sort("timestamp", -1))
-            
-            # Convert ObjectId to string for JSON serialization
-            for record in history:
-                record['_id'] = str(record['_id'])
-                if isinstance(record['timestamp'], datetime):
-                    record['timestamp'] = record['timestamp'].isoformat()
-            
-            print(f"📊 History: Retrieved {len(history)} records from analysis_history" + (f" for factory {factory_id}" if factory_id else " (all factories)"))
-            
-        else:
-            # Return mock data for testing
-            history = MOCK_HISTORY.copy()
-            print("📝 Returning mock history data")
+        # Build query filter
+        query_filter = {}
+        if factory_id:
+            query_filter["factory_id"] = factory_id
+            print(f"🏭 Filtering history for factory: {factory_id}")
         
-        return jsonify({"status": "success", "history": history})
+        # Get analysis history with factory filter, sorted by timestamp (newest first)
+        print("Executing MongoDB query...")
+        cursor = analysis_history_collection.find(query_filter).sort("timestamp", -1)
+        history = list(cursor)
+        print(f"Found {len(history)} records in MongoDB")
+        
+        # Convert ObjectId to string and format timestamp for JSON serialization
+        formatted_history = []
+        for record in history:
+            # Convert ObjectId fields to strings
+            record['_id'] = str(record['_id'])
+            record['truck_id'] = str(record.get('truck_id', ''))
+            
+            # Use owner-corrected predictions if available, otherwise use original AI predictions
+            if record.get('predictions_corrected') and record.get('owner_corrected_scrap_predictions'):
+                record['scrap_predictions'] = record['owner_corrected_scrap_predictions']
+                print(f"📝 Using corrected scrap predictions for record {record.get('_id')}")
+                
+            if record.get('predictions_corrected') and record.get('owner_corrected_plate_predictions'):
+                record['plate_predictions'] = record['owner_corrected_plate_predictions']
+                print(f"📝 Using corrected plate predictions for record {record.get('_id')}")
+            
+            # Clean up the response - remove the separate corrected fields
+            record.pop('owner_corrected_scrap_predictions', None)
+            record.pop('owner_corrected_plate_predictions', None)
+            
+            # Ensure timestamp is in ISO format
+            if isinstance(record['timestamp'], datetime):
+                record['timestamp'] = record['timestamp'].isoformat()
+            
+            # Add submission status if not present
+            if 'submitted_to_owner' not in record:
+                record['submitted_to_owner'] = False
+            
+            # If there's a labourer_id, get labourer info
+            if 'labourer_id' in record and MONGODB_AVAILABLE:
+                try:
+                    labourer = users_collection.find_one({"_id": ObjectId(record['labourer_id'])})
+                    if labourer:
+                        record['labourer_name'] = labourer.get('name', 'Unknown')
+                        record['labourer_email'] = labourer.get('email', '')
+                except Exception as e:
+                    print(f"⚠️ Error fetching labourer info: {e}")
+                    record['labourer_name'] = 'Unknown'
+                    record['labourer_email'] = ''
+            
+            formatted_history.append(record)
+        
+        print(f"📊 History: Returning {len(formatted_history)} records" + (f" for factory {factory_id}" if factory_id else " (all factories)"))
+        
+        return jsonify({
+            "status": "success", 
+            "history": formatted_history,
+            "count": len(formatted_history),
+            "factory_id": factory_id
+        })
+        
     except Exception as e:
-        print(f"❌ History error: {e}")
-        # Fallback to mock data on error
-        return jsonify({"status": "success", "history": MOCK_HISTORY})
+        error_msg = f"Failed to fetch history: {str(e)}"
+        print(f"❌ History error: {error_msg}")
+        return jsonify({
+            "status": "error",
+            "message": error_msg
+        }), 500
 
 # ========== Auth Routes ==========
 
@@ -516,6 +598,9 @@ def login():
 
         if not email or not password:
             return jsonify({"status": "error", "message": "Email and password required"}), 400
+            
+        if requested_role not in ['admin', 'owner', 'labourer']:
+            return jsonify({"status": "error", "message": "Invalid role"}), 400
 
         if not MONGODB_AVAILABLE:
             print("📝 Mock login: User logged in")
@@ -537,23 +622,42 @@ def login():
         # Verify password properly
         if not verify_password(password, user.get('password', '')):
             return jsonify({"status": "error", "message": "Invalid credentials"}), 401
-
-        if requested_role and requested_role != user.get('role'):
-            return jsonify({"status": "error", "message": "Role mismatch"}), 403
+            
+        # Verify role matches
+        if user.get('role') != requested_role:
+            return jsonify({"status": "error", "message": "Invalid role for this user"}), 403
 
         # Create new session
         session_token = create_session(str(user.get('_id')), user.get('email'), user.get('role'))
 
-        # Build user response with factory_id if available
+        # Build user response
         user_response = {
             "email": user.get('email'),
-            "role": user.get('role', 'worker'),
+            "role": user.get('role'),
             "id": str(user.get('_id')),
         }
         
         # Add factory_id for owners and labourers
         if user.get('role') in ['owner', 'labourer'] and user.get('factory_id'):
             user_response["factory_id"] = user.get('factory_id')
+            
+        # For labourers, include their factory ID, owner ID, and department
+        if user.get('role') == 'labourer':
+            user_response.update({
+                "department": user.get('department', 'General'),
+                "name": user.get('name', ''),
+                "employee_id": user.get('employee_id', ''),
+                "owner_id": user.get('owner_id', '')  # Include owner_id for submission functionality
+            })
+            
+        # For owners, include additional factory info
+        if user.get('role') == 'owner':
+            factory = db.factories.find_one({"owner_id": str(user.get('_id'))})
+            if factory:
+                user_response.update({
+                    "factory_name": factory.get('name', ''),
+                    "factory_type": factory.get('factory_type', '')
+                })
         
         return jsonify({
             "status": "success",
@@ -637,7 +741,6 @@ def get_scrap_types():
         scrap_types = [
             {
                 "name": "CRC",
-                "price": 52000,
                 "rawMaterials": ["Cold Rolled Coil", "Zinc Coating", "Chromium", "Nickel"],
                 "processingSteps": ["Inspection", "Cleaning", "Coating Removal", "Melting", "Alloying"],
                 "energyRequired": "2.8 MWh/ton",
@@ -646,7 +749,6 @@ def get_scrap_types():
             },
             {
                 "name": "Burada",
-                "price": 38000,
                 "rawMaterials": ["Iron Ore", "Coke", "Limestone", "Dolomite"],
                 "processingSteps": ["Sorting", "Crushing", "Screening", "Blending", "Sintering"],
                 "energyRequired": "3.2 MWh/ton",
@@ -655,7 +757,6 @@ def get_scrap_types():
             },
             {
                 "name": "K2",
-                "price": 65000,
                 "rawMaterials": ["High Carbon Steel", "Manganese", "Silicon", "Chromium"],
                 "processingSteps": ["Grading", "Cleaning", "Melting", "Alloying", "Refining"],
                 "energyRequired": "3.5 MWh/ton",
@@ -664,7 +765,6 @@ def get_scrap_types():
             },
             {
                 "name": "Selected",
-                "price": 75000,
                 "rawMaterials": ["Premium Steel", "Alloy Elements", "Clean Scrap"],
                 "processingSteps": ["Quality Check", "Sorting", "Cleaning", "Melting", "Refining"],
                 "energyRequired": "2.2 MWh/ton",
@@ -673,7 +773,6 @@ def get_scrap_types():
             },
             {
                 "name": "Piece to Piece",
-                "price": 42000,
                 "rawMaterials": ["Mixed Steel", "Iron", "Alloy Elements"],
                 "processingSteps": ["Manual Sorting", "Size Classification", "Cleaning", "Melting"],
                 "energyRequired": "2.8 MWh/ton",
@@ -682,7 +781,6 @@ def get_scrap_types():
             },
             {
                 "name": "Melting",
-                "price": 35000,
                 "rawMaterials": ["Low Grade Steel", "Iron", "Carbon"],
                 "processingSteps": ["Preheating", "Melting", "Basic Refining", "Casting"],
                 "energyRequired": "4.0 MWh/ton",
@@ -691,7 +789,6 @@ def get_scrap_types():
             },
             {
                 "name": "Sponge Iron",
-                "price": 28000,
                 "rawMaterials": ["Iron Ore", "Coal", "Natural Gas"],
                 "processingSteps": ["Reduction", "Cooling", "Screening", "Briquetting"],
                 "energyRequired": "5.5 MWh/ton",
@@ -749,11 +846,18 @@ def get_analytics_data():
         print(f"🏭 Analytics Query: {query_filter}")
         print(f"📊 Found {len(analysis_history)} records for factory {factory_id or 'ALL'}")
         
-        # Convert ObjectId to string for JSON serialization
+        # Convert ObjectId to string for JSON serialization and use corrected predictions
         for record in analysis_history:
             record['_id'] = str(record['_id'])
             if isinstance(record['timestamp'], datetime):
                 record['timestamp'] = record['timestamp'].isoformat()
+                
+            # Use owner-corrected predictions if available, otherwise use original AI predictions
+            if record.get('predictions_corrected') and record.get('owner_corrected_scrap_predictions'):
+                record['scrap_predictions'] = record['owner_corrected_scrap_predictions']
+                
+            if record.get('predictions_corrected') and record.get('owner_corrected_plate_predictions'):
+                record['plate_predictions'] = record['owner_corrected_plate_predictions']
         
         # Sort by timestamp
         analysis_history.sort(key=lambda x: x['timestamp'])
@@ -1056,6 +1160,284 @@ def get_labourers():
         print(f"❌ Error getting labourers: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/labourer/submit-analysis', methods=['POST'])
+def submit_analysis():
+    """Submit analysis results from labourer to owner"""
+    try:
+        if not MONGODB_AVAILABLE:
+            return jsonify({"status": "error", "message": "MongoDB not available"}), 503
+            
+        data = request.get_json(force=True)
+        required_fields = ['analysis_id', 'labourer_id', 'factory_id', 'notes']
+        
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({
+                    "status": "error",
+                    "message": f"Missing required field: {field}"
+                }), 400
+                
+        # Get the factory's owner ID from the database
+        factory_id = data.get('factory_id')
+        
+        # Try to find owner by factory_id first (more reliable)
+        owner = users_collection.find_one({
+            "role": "owner",
+            "factory_id": factory_id
+        })
+        
+        # If not found, try to find via factory collection
+        if not owner:
+            try:
+                factory = db.factories.find_one({"_id": ObjectId(factory_id)})
+                if factory and factory.get('owner_id'):
+                    owner = users_collection.find_one({"_id": ObjectId(factory['owner_id'])})
+            except Exception as e:
+                print(f"❌ Error looking up via factory collection: {e}")
+        
+        if not owner:
+            return jsonify({
+                "status": "error",
+                "message": f"Could not find factory owner for factory_id: {factory_id}. Please log out and log back in to refresh your session data."
+            }), 404
+            
+        owner_id = str(owner['_id'])
+                
+        # Update the analysis record with labourer's submission
+        result = analysis_history_collection.update_one(
+            {"_id": ObjectId(data['analysis_id'])},
+            {
+                "$set": {
+                    "labourer_id": data['labourer_id'],
+                    "submitted_to_owner": True,
+                    "submission_timestamp": datetime.utcnow(),
+                    "labourer_notes": data['notes'],
+                    "status": "submitted",
+                    "verification_status": "pending"
+                }
+            }
+        )
+        
+        if result.modified_count == 0:
+            return jsonify({
+                "status": "error",
+                "message": "Analysis record not found or not modified"
+            }), 404
+            
+        return jsonify({
+            "status": "success",
+            "message": "Analysis submitted to owner successfully"
+        })
+        
+    except Exception as e:
+        print(f"❌ Error submitting analysis: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/owner/pending-verifications', methods=['GET'])
+def get_pending_verifications():
+    """Get all analyses pending verification for the current owner"""
+    try:
+        if not MONGODB_AVAILABLE:
+            return jsonify({"status": "error", "message": "MongoDB not available"}), 503
+            
+        factory_id = request.args.get('factory_id')
+        if not factory_id:
+            return jsonify({"status": "error", "message": "Factory ID required"}), 400
+        
+        # Find analyses that have been submitted but not yet verified
+        from app.utils import serialize_mongodb_doc
+        
+        cursor = analysis_history_collection.find({
+            "factory_id": factory_id,
+            "submitted_to_owner": True,
+            "$or": [
+                {"verification_status": {"$exists": False}},
+                {"verification_status": "pending"}
+            ]
+        }).sort("submission_timestamp", -1)
+        
+        pending = list(cursor)
+        
+        # Serialize MongoDB documents and get laborer info
+        for record in pending:
+            if 'labourer_id' in record:
+                laborer = users_collection.find_one({"_id": ObjectId(record['labourer_id'])})
+                if laborer:
+                    record['labourer_name'] = laborer.get('name', 'Unknown')
+                    record['labourer_email'] = laborer.get('email', '')
+                    record['employee_id'] = laborer.get('employee_id', '')
+        
+        pending = serialize_mongodb_doc(pending)
+        
+        print(f"📝 Found {len(pending)} pending verifications for factory {factory_id}")
+        
+        return jsonify({
+            "status": "success",
+            "pending_verifications": pending,
+            "count": len(pending)
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting pending verifications: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/owner/verify-analysis', methods=['POST'])
+def verify_analysis():
+    """Verify (approve/reject) an analysis submission"""
+    try:
+        if not MONGODB_AVAILABLE:
+            return jsonify({"status": "error", "message": "MongoDB not available"}), 503
+            
+        data = request.get_json(force=True)
+        required_fields = ['analysis_id', 'factory_id', 'verification_status', 'owner_id']
+        
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({
+                    "status": "error",
+                    "message": f"Missing required field: {field}"
+                }), 400
+        
+        verification_status = data.get('verification_status')
+        if verification_status not in ['approved', 'rejected']:
+            return jsonify({
+                "status": "error",
+                "message": "Verification status must be 'approved' or 'rejected'"
+            }), 400
+        
+        # Update the analysis record with owner's verification
+        update_data = {
+            "verification_status": verification_status,
+            "verified_by": data.get('owner_id'),
+            "verification_timestamp": datetime.utcnow(),
+            "owner_notes": data.get('owner_notes', ''),
+            "status": verification_status
+        }
+        
+        # If owner provided corrected predictions, save them
+        if data.get('corrected_scrap_predictions'):
+            update_data["owner_corrected_scrap_predictions"] = data.get('corrected_scrap_predictions')
+            update_data["predictions_corrected"] = True
+            print(f"📝 Owner corrected scrap predictions: {data.get('corrected_scrap_predictions')}")
+            
+        if data.get('corrected_plate_predictions'):
+            update_data["owner_corrected_plate_predictions"] = data.get('corrected_plate_predictions')
+            update_data["predictions_corrected"] = True
+            print(f"📝 Owner corrected plate predictions: {data.get('corrected_plate_predictions')}")
+        
+        result = analysis_history_collection.update_one(
+            {
+                "_id": ObjectId(data['analysis_id']),
+                "factory_id": data['factory_id'],
+                "submitted_to_owner": True
+            },
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            return jsonify({
+                "status": "error",
+                "message": "Analysis record not found or not authorized"
+            }), 404
+            
+        action = "approved" if verification_status == "approved" else "rejected"
+        message = f"Analysis {action} successfully"
+        
+        # Add note about corrections if any were made
+        if data.get('corrected_scrap_predictions') or data.get('corrected_plate_predictions'):
+            message += " with owner corrections"
+            
+        return jsonify({
+            "status": "success",
+            "message": message
+        })
+        
+    except Exception as e:
+        print(f"❌ Error verifying analysis: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/labourer/pending-submissions', methods=['GET'])
+def get_pending_submissions():
+    """Get all analyses for the labourer (both pending and submitted with status)"""
+    try:
+        if not MONGODB_AVAILABLE:
+            return jsonify({"status": "error", "message": "MongoDB not available"}), 503
+            
+        labourer_id = request.args.get('labourer_id')
+        if not labourer_id:
+            return jsonify({"status": "error", "message": "Labourer ID required"}), 400
+            
+        # Find all analyses done by this labourer (both pending and submitted)
+        from app.utils import serialize_mongodb_doc
+        
+        cursor = analysis_history_collection.find({
+            "labourer_id": labourer_id
+        }).sort("timestamp", -1).limit(20)  # Limit to last 20 submissions
+        
+        pending = list(cursor)
+        
+        # Use corrected predictions if available before serialization
+        for record in pending:
+            if record.get('predictions_corrected') and record.get('owner_corrected_scrap_predictions'):
+                record['scrap_predictions'] = record['owner_corrected_scrap_predictions']
+                
+            if record.get('predictions_corrected') and record.get('owner_corrected_plate_predictions'):
+                record['plate_predictions'] = record['owner_corrected_plate_predictions']
+            
+            # Clean up the response
+            record.pop('owner_corrected_scrap_predictions', None)
+            record.pop('owner_corrected_plate_predictions', None)
+        
+        # Serialize MongoDB documents
+        pending = serialize_mongodb_doc(pending)
+        
+        print(f"📝 Found {len(pending)} submissions for labourer {labourer_id}")
+        
+        return jsonify({
+            "status": "success",
+            "pending": pending
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting pending submissions: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/analysis/<analysis_id>', methods=['DELETE'])
+def delete_analysis(analysis_id):
+    """Delete an analysis record"""
+    try:
+        if not MONGODB_AVAILABLE:
+            return jsonify({"status": "error", "message": "MongoDB not available"}), 503
+            
+        # Validate ObjectId format
+        try:
+            obj_id = ObjectId(analysis_id)
+        except Exception:
+            return jsonify({"status": "error", "message": "Invalid analysis ID format"}), 400
+            
+        # Optional: Add authorization check here
+        # For now, allowing any user to delete any analysis
+        # In production, you might want to check if user owns this analysis
+        
+        # Delete the analysis record
+        result = analysis_history_collection.delete_one({"_id": obj_id})
+        
+        if result.deleted_count == 0:
+            return jsonify({
+                "status": "error",
+                "message": "Analysis record not found"
+            }), 404
+            
+        print(f"🗑️ Analysis record deleted: {analysis_id}")
+        return jsonify({
+            "status": "success",
+            "message": "Analysis record deleted successfully"
+        })
+        
+    except Exception as e:
+        print(f"❌ Error deleting analysis: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/owner/stats', methods=['GET'])
 def get_owner_stats():
     """Get factory statistics for the current owner"""
@@ -1142,6 +1524,7 @@ def create_labourer():
             "created_at": datetime.utcnow(),
             "created_by": factory['owner_id'],
             "factory_id": data['factory_id'],
+            "owner_id": factory['owner_id'],  # Add owner_id for submission functionality
             "is_active": True,
             "permissions": ["upload_images", "view_own_analysis", "basic_reports"]
         }
@@ -1355,8 +1738,10 @@ def get_owner_history():
                     "plate_image": 1,
                     "scrap_predictions": 1,
                     "plate_predictions": 1,
-                    "estimated_weight": 1,
-                    "estimated_price": 1,
+                    "owner_corrected_scrap_predictions": 1,
+                    "owner_corrected_plate_predictions": 1,
+                    "predictions_corrected": 1,
+                    "verification_status": 1,
                     "processing_time": 1,
                     "status": 1,
                     "worker_id": 1
@@ -1373,10 +1758,23 @@ def get_owner_history():
         factory = db.factories.find_one({"_id": ObjectId(factory_id)})
         factory_name = factory.get("name", "Unknown Factory") if factory else "Unknown Factory"
         
-        # Convert ObjectIds to strings for JSON serialization
+        # Convert ObjectIds to strings for JSON serialization and prioritize corrected predictions
         for record in history_data:
             if '_id' in record:
                 record['_id'] = str(record['_id'])
+            
+            # Use owner-corrected predictions if available, otherwise use original AI predictions
+            if record.get('predictions_corrected') and record.get('owner_corrected_scrap_predictions'):
+                record['scrap_predictions'] = record['owner_corrected_scrap_predictions']
+                print(f"📝 Using corrected scrap predictions for record {record.get('_id')}")
+                
+            if record.get('predictions_corrected') and record.get('owner_corrected_plate_predictions'):
+                record['plate_predictions'] = record['owner_corrected_plate_predictions']
+                print(f"📝 Using corrected plate predictions for record {record.get('_id')}")
+            
+            # Clean up the response - remove the separate corrected fields
+            record.pop('owner_corrected_scrap_predictions', None)
+            record.pop('owner_corrected_plate_predictions', None)
         
         history_response = {
             "factory_name": factory_name,

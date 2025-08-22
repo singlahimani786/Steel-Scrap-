@@ -66,15 +66,36 @@ def upload():
 @upload_route.route('/history', methods=['GET'])
 def get_history():
     try:
-        # Get all analysis history, sorted by timestamp (newest first)
-        history = list(analysis_history_collection.find().sort("timestamp", -1))
+        # Get factory_id from query params
+        factory_id = request.args.get('factory_id')
         
-        # Convert ObjectId to string for JSON serialization
+        # Build query filter
+        query = {}
+        if factory_id:
+            query['factory_id'] = factory_id
+            print(f"Filtering history for factory_id: {factory_id}")
+        
+        # Get analysis history with filters, sorted by timestamp (newest first)
+        history = list(analysis_history_collection.find(query).sort("timestamp", -1))
+        print(f"Retrieved {len(history)} records")
+        
+        # Convert ObjectId to string for JSON serialization and format timestamp
         for record in history:
             record['_id'] = str(record['_id'])
             record['truck_id'] = str(record['truck_id'])
-            record['timestamp'] = record['timestamp'].isoformat()
+            if isinstance(record['timestamp'], datetime):
+                record['timestamp'] = record['timestamp'].isoformat()
         
-        return jsonify({"status": "success", "history": history})
+        return jsonify({
+            "status": "success", 
+            "history": history,
+            "count": len(history),
+            "factory_id": factory_id if factory_id else None
+        })
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        print(f"Error fetching history: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": "Failed to fetch history data",
+            "error": str(e)
+        }), 500

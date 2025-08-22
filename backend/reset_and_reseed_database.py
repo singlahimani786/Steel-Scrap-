@@ -180,6 +180,7 @@ def reset_and_reseed_database():
                     "created_at": datetime.utcnow(),
                     "created_by": factory_info["owner_id"],
                     "factory_id": factory_id,
+                    "owner_id": factory_info["owner_id"],  # Add owner_id for submission functionality
                     "is_active": True,
                     "permissions": ["upload_images", "view_own_analysis", "basic_reports"],
                     "employee_id": f"EMP{i+1:03d}",
@@ -233,8 +234,7 @@ def reset_and_reseed_database():
                                 "bbox": [50, 50, 300, 100]
                             }
                         ],
-                        "estimated_weight": 5.0 + (record_num * 2.5),
-                        "estimated_price": (5.0 + (record_num * 2.5)) * 45000,
+
                         "analysis_id": f"analysis_{factory_id}_{day}_{record_num}",
                         "worker_id": f"worker_{factory_id}_{record_num % 3 + 1}",
                         "processing_time": 3.0 + (record_num * 0.5),

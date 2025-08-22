@@ -1,11 +1,20 @@
 'use client'
 import { DataTable } from "./data-table" 
-import { Payment,columns } from "./columns"
+import { AnalysisRecord, columns } from "./columns"
 
-export default  function DaataTable(){
-    return (
-        <div className="container mx-auto py-10">
-          <DataTable columns={columns} data={[]} />
-        </div>
-      )
+interface DaataTableProps {
+  data: AnalysisRecord[];
+}
+
+export default function DaataTable({ data }: DaataTableProps) {
+  return (
+    <div className="container mx-auto py-10">
+      <DataTable 
+        columns={columns} 
+        data={data} 
+        filterColumn="truck_number"
+        filterPlaceholder="Filter by truck number or scrap type..."
+      />
+    </div>
+  );
 }

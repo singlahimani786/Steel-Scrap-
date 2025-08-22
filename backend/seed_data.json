@@ -1,0 +1,868 @@
+{
+  "analysis_history": [
+    {
+      "_id": "analysis_20240801_001",
+      "timestamp": "2024-08-01T09:00:00+05:30",
+      "truck_number": "MH01AB1234",
+      "scrap_image": "scrap_crc_20240801_001.jpg",
+      "plate_image": "plate_MH01AB1234_20240801_001.jpg",
+      "scrap_predictions": [
+        {
+          "class": "CRC",
+          "confidence": 0.95,
+          "x": 250,
+          "y": 300,
+          "width": 150,
+          "height": 120
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.92,
+          "x": 300,
+          "y": 100,
+          "width": 100,
+          "height": 25
+        }
+      ],
+      "analysis_id": "analysis_20240801_001"
+    },
+    {
+      "_id": "analysis_20240801_002",
+      "timestamp": "2024-08-01T10:30:00+05:30",
+      "truck_number": "DL02CD5678",
+      "scrap_image": "scrap_burada_20240801_002.jpg",
+      "plate_image": "plate_DL02CD5678_20240801_002.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Burada",
+          "confidence": 0.88,
+          "x": 200,
+          "y": 250,
+          "width": 180,
+          "height": 140
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.89,
+          "x": 280,
+          "y": 80,
+          "width": 110,
+          "height": 30
+        }
+      ],
+      "analysis_id": "analysis_20240801_002"
+    },
+    {
+      "_id": "analysis_20240801_003",
+      "timestamp": "2024-08-01T11:15:00+05:30",
+      "truck_number": "KA03EF9012",
+      "scrap_image": "scrap_k2_20240801_003.jpg",
+      "plate_image": "plate_KA03EF9012_20240801_003.jpg",
+      "scrap_predictions": [
+        {
+          "class": "K2",
+          "confidence": 0.97,
+          "x": 300,
+          "y": 280,
+          "width": 160,
+          "height": 130
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.94,
+          "x": 320,
+          "y": 90,
+          "width": 95,
+          "height": 28
+        }
+      ],
+      "analysis_id": "analysis_20240801_003"
+    },
+    {
+      "_id": "analysis_20240801_004",
+      "timestamp": "2024-08-01T12:00:00+05:30",
+      "truck_number": "TN04GH3456",
+      "scrap_image": "scrap_selected_20240801_004.jpg",
+      "plate_image": "plate_TN04GH3456_20240801_004.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Selected",
+          "confidence": 0.96,
+          "x": 220,
+          "y": 320,
+          "width": 140,
+          "height": 110
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.91,
+          "x": 290,
+          "y": 85,
+          "width": 105,
+          "height": 26
+        }
+      ],
+      "analysis_id": "analysis_20240801_004"
+    },
+    {
+      "_id": "analysis_20240801_005",
+      "timestamp": "2024-08-01T13:45:00+05:30",
+      "truck_number": "AP05IJ7890",
+      "scrap_image": "scrap_piece_to_piece_20240801_005.jpg",
+      "plate_image": "plate_AP05IJ7890_20240801_005.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Piece to Piece",
+          "confidence": 0.87,
+          "x": 180,
+          "y": 240,
+          "width": 120,
+          "height": 90
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.88,
+          "x": 270,
+          "y": 75,
+          "width": 115,
+          "height": 32
+        }
+      ],
+      "analysis_id": "analysis_20240801_005"
+    },
+    {
+      "_id": "analysis_20240801_006",
+      "timestamp": "2024-08-01T14:30:00+05:30",
+      "truck_number": "GJ01AB1234",
+      "scrap_image": "scrap_melting_20240801_006.jpg",
+      "plate_image": "plate_GJ01AB1234_20240801_006.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Melting",
+          "confidence": 0.82,
+          "x": 160,
+          "y": 200,
+          "width": 200,
+          "height": 150
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.85,
+          "x": 250,
+          "y": 70,
+          "width": 120,
+          "height": 35
+        }
+      ],
+      "analysis_id": "analysis_20240801_006"
+    },
+    {
+      "_id": "analysis_20240801_007",
+      "timestamp": "2024-08-01T15:15:00+05:30",
+      "truck_number": "UP02CD5678",
+      "scrap_image": "scrap_sponge_iron_20240801_007.jpg",
+      "plate_image": "plate_UP02CD5678_20240801_007.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Sponge Iron",
+          "confidence": 0.90,
+          "x": 240,
+          "y": 260,
+          "width": 170,
+          "height": 140
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.87,
+          "x": 310,
+          "y": 95,
+          "width": 100,
+          "height": 27
+        }
+      ],
+      "analysis_id": "analysis_20240801_007"
+    },
+    {
+      "_id": "analysis_20240802_001",
+      "timestamp": "2024-08-02T08:30:00+05:30",
+      "truck_number": "MH03EF9012",
+      "scrap_image": "scrap_crc_20240802_001.jpg",
+      "plate_image": "plate_MH03EF9012_20240802_001.jpg",
+      "scrap_predictions": [
+        {
+          "class": "CRC",
+          "confidence": 0.93,
+          "x": 260,
+          "y": 290,
+          "width": 145,
+          "height": 125
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.90,
+          "x": 295,
+          "y": 88,
+          "width": 108,
+          "height": 29
+        }
+      ],
+      "analysis_id": "analysis_20240802_001"
+    },
+    {
+      "_id": "analysis_20240802_002",
+      "timestamp": "2024-08-02T09:45:00+05:30",
+      "truck_number": "DL04GH3456",
+      "scrap_image": "scrap_burada_20240802_002.jpg",
+      "plate_image": "plate_DL04GH3456_20240802_002.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Burada",
+          "confidence": 0.91,
+          "x": 210,
+          "y": 255,
+          "width": 175,
+          "height": 135
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.93,
+          "x": 285,
+          "y": 82,
+          "width": 112,
+          "height": 31
+        }
+      ],
+      "analysis_id": "analysis_20240802_002"
+    },
+    {
+      "_id": "analysis_20240802_003",
+      "timestamp": "2024-08-02T10:20:00+05:30",
+      "truck_number": "KA05IJ7890",
+      "scrap_image": "scrap_k2_20240802_003.jpg",
+      "plate_image": "plate_KA05IJ7890_20240802_003.jpg",
+      "scrap_predictions": [
+        {
+          "class": "K2",
+          "confidence": 0.95,
+          "x": 280,
+          "y": 275,
+          "width": 155,
+          "height": 128
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.89,
+          "x": 275,
+          "y": 78,
+          "width": 118,
+          "height": 33
+        }
+      ],
+      "analysis_id": "analysis_20240802_003"
+    },
+    {
+      "_id": "analysis_20240802_004",
+      "timestamp": "2024-08-02T11:10:00+05:30",
+      "truck_number": "TN01AB1234",
+      "scrap_image": "scrap_selected_20240802_004.jpg",
+      "plate_image": "plate_TN01AB1234_20240802_004.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Selected",
+          "confidence": 0.98,
+          "x": 230,
+          "y": 315,
+          "width": 135,
+          "height": 105
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.92,
+          "x": 300,
+          "y": 92,
+          "width": 102,
+          "height": 24
+        }
+      ],
+      "analysis_id": "analysis_20240802_004"
+    },
+    {
+      "_id": "analysis_20240802_005",
+      "timestamp": "2024-08-02T12:30:00+05:30",
+      "truck_number": "AP02CD5678",
+      "scrap_image": "scrap_piece_to_piece_20240802_005.jpg",
+      "plate_image": "plate_AP02CD5678_20240802_005.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Piece to Piece",
+          "confidence": 0.86,
+          "x": 190,
+          "y": 235,
+          "width": 125,
+          "height": 95
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.86,
+          "x": 265,
+          "y": 72,
+          "width": 125,
+          "height": 34
+        }
+      ],
+      "analysis_id": "analysis_20240802_005"
+    },
+    {
+      "_id": "analysis_20240802_006",
+      "timestamp": "2024-08-02T13:15:00+05:30",
+      "truck_number": "GJ03EF9012",
+      "scrap_image": "scrap_melting_20240802_006.jpg",
+      "plate_image": "plate_GJ03EF9012_20240802_006.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Melting",
+          "confidence": 0.84,
+          "x": 170,
+          "y": 205,
+          "width": 195,
+          "height": 145
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.88,
+          "x": 255,
+          "y": 68,
+          "width": 125,
+          "height": 38
+        }
+      ],
+      "analysis_id": "analysis_20240802_006"
+    },
+    {
+      "_id": "analysis_20240802_007",
+      "timestamp": "2024-08-02T14:00:00+05:30",
+      "truck_number": "UP04GH3456",
+      "scrap_image": "scrap_sponge_iron_20240802_007.jpg",
+      "plate_image": "plate_UP04GH3456_20240802_007.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Sponge Iron",
+          "confidence": 0.89,
+          "x": 250,
+          "y": 265,
+          "width": 165,
+          "height": 138
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.85,
+          "x": 315,
+          "y": 93,
+          "width": 98,
+          "height": 26
+        }
+      ],
+      "analysis_id": "analysis_20240802_007"
+    },
+    {
+      "_id": "analysis_20240803_001",
+      "timestamp": "2024-08-03T09:30:00+05:30",
+      "truck_number": "MH05IJ7890",
+      "scrap_image": "scrap_crc_20240803_001.jpg",
+      "plate_image": "plate_MH05IJ7890_20240803_001.jpg",
+      "scrap_predictions": [
+        {
+          "class": "CRC",
+          "confidence": 0.94,
+          "x": 245,
+          "y": 285,
+          "width": 148,
+          "height": 122
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.91,
+          "x": 288,
+          "y": 86,
+          "width": 110,
+          "height": 28
+        }
+      ],
+      "analysis_id": "analysis_20240803_001"
+    },
+    {
+      "_id": "analysis_20240803_002",
+      "timestamp": "2024-08-03T10:45:00+05:30",
+      "truck_number": "DL01AB1234",
+      "scrap_image": "scrap_burada_20240803_002.jpg",
+      "plate_image": "plate_DL01AB1234_20240803_002.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Burada",
+          "confidence": 0.87,
+          "x": 205,
+          "y": 250,
+          "width": 178,
+          "height": 132
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.89,
+          "x": 282,
+          "y": 79,
+          "width": 114,
+          "height": 30
+        }
+      ],
+      "analysis_id": "analysis_20240803_002"
+    },
+    {
+      "_id": "analysis_20240803_003",
+      "timestamp": "2024-08-03T11:20:00+05:30",
+      "truck_number": "KA02CD5678",
+      "scrap_image": "scrap_k2_20240803_003.jpg",
+      "plate_image": "plate_KA02CD5678_20240803_003.jpg",
+      "scrap_predictions": [
+        {
+          "class": "K2",
+          "confidence": 0.96,
+          "x": 275,
+          "y": 270,
+          "width": 158,
+          "height": 125
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.90,
+          "x": 272,
+          "y": 76,
+          "width": 120,
+          "height": 32
+        }
+      ],
+      "analysis_id": "analysis_20240803_003"
+    },
+    {
+      "_id": "analysis_20240803_004",
+      "timestamp": "2024-08-03T12:10:00+05:30",
+      "truck_number": "TN03EF9012",
+      "scrap_image": "scrap_selected_20240803_004.jpg",
+      "plate_image": "plate_TN03EF9012_20240803_004.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Selected",
+          "confidence": 0.97,
+          "x": 225,
+          "y": 310,
+          "width": 140,
+          "height": 108
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.93,
+          "x": 305,
+          "y": 89,
+          "width": 104,
+          "height": 25
+        }
+      ],
+      "analysis_id": "analysis_20240803_004"
+    },
+    {
+      "_id": "analysis_20240803_005",
+      "timestamp": "2024-08-03T13:30:00+05:30",
+      "truck_number": "AP04GH3456",
+      "scrap_image": "scrap_piece_to_piece_20240803_005.jpg",
+      "plate_image": "plate_AP04GH3456_20240803_005.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Piece to Piece",
+          "confidence": 0.85,
+          "x": 185,
+          "y": 230,
+          "width": 130,
+          "height": 92
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.87,
+          "x": 268,
+          "y": 74,
+          "width": 128,
+          "height": 36
+        }
+      ],
+      "analysis_id": "analysis_20240803_005"
+    },
+    {
+      "_id": "analysis_20240803_006",
+      "timestamp": "2024-08-03T14:15:00+05:30",
+      "truck_number": "GJ05IJ7890",
+      "scrap_image": "scrap_melting_20240803_006.jpg",
+      "plate_image": "plate_GJ05IJ7890_20240803_006.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Melting",
+          "confidence": 0.83,
+          "x": 165,
+          "y": 198,
+          "width": 198,
+          "height": 142
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.86,
+          "x": 252,
+          "y": 66,
+          "width": 130,
+          "height": 40
+        }
+      ],
+      "analysis_id": "analysis_20240803_006"
+    },
+    {
+      "_id": "analysis_20240803_007",
+      "timestamp": "2024-08-03T15:00:00+05:30",
+      "truck_number": "UP01AB1234",
+      "scrap_image": "scrap_sponge_iron_20240803_007.jpg",
+      "plate_image": "plate_UP01AB1234_20240803_007.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Sponge Iron",
+          "confidence": 0.88,
+          "x": 235,
+          "y": 255,
+          "width": 172,
+          "height": 135
+        }
+      ],
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.84,
+          "x": 308,
+          "y": 91,
+          "width": 96,
+          "height": 27
+        }
+      ],
+      "analysis_id": "analysis_20240803_007"
+    }
+  ],
+  "truck_records": [
+    {
+      "_id": "truck_001",
+      "truck_number": "MH01AB1234",
+      "plate_image": "plate_MH01AB1234_20240801_001.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.92,
+          "x": 300,
+          "y": 100,
+          "width": 100,
+          "height": 25
+        }
+      ],
+      "last_updated": "2024-08-01T09:00:00+05:30"
+    },
+    {
+      "_id": "truck_002",
+      "truck_number": "DL02CD5678",
+      "plate_image": "plate_DL02CD5678_20240801_002.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.89,
+          "x": 280,
+          "y": 80,
+          "width": 110,
+          "height": 30
+        }
+      ],
+      "last_updated": "2024-08-01T10:30:00+05:30"
+    },
+    {
+      "_id": "truck_003",
+      "truck_number": "KA03EF9012",
+      "plate_image": "plate_KA03EF9012_20240801_003.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.94,
+          "x": 320,
+          "y": 90,
+          "width": 95,
+          "height": 28
+        }
+      ],
+      "last_updated": "2024-08-01T11:15:00+05:30"
+    },
+    {
+      "_id": "truck_004",
+      "truck_number": "TN04GH3456",
+      "plate_image": "plate_TN04GH3456_20240801_004.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.91,
+          "x": 290,
+          "y": 85,
+          "width": 105,
+          "height": 26
+        }
+      ],
+      "last_updated": "2024-08-01T12:00:00+05:30"
+    },
+    {
+      "_id": "truck_005",
+      "truck_number": "AP05IJ7890",
+      "plate_image": "plate_AP05IJ7890_20240801_005.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.88,
+          "x": 270,
+          "y": 75,
+          "width": 115,
+          "height": 32
+        }
+      ],
+      "last_updated": "2024-08-01T13:45:00+05:30"
+    },
+    {
+      "_id": "truck_006",
+      "truck_number": "GJ01AB1234",
+      "plate_image": "plate_GJ01AB1234_20240801_006.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.85,
+          "x": 250,
+          "y": 70,
+          "width": 120,
+          "height": 35
+        }
+      ],
+      "last_updated": "2024-08-01T14:30:00+05:30"
+    },
+    {
+      "_id": "truck_007",
+      "truck_number": "UP02CD5678",
+      "plate_image": "plate_UP02CD5678_20240801_007.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.87,
+          "x": 310,
+          "y": 95,
+          "width": 100,
+          "height": 27
+        }
+      ],
+      "last_updated": "2024-08-01T15:15:00+05:30"
+    },
+    {
+      "_id": "truck_008",
+      "truck_number": "MH03EF9012",
+      "plate_image": "plate_MH03EF9012_20240802_001.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.90,
+          "x": 295,
+          "y": 88,
+          "width": 108,
+          "height": 29
+        }
+      ],
+      "last_updated": "2024-08-02T08:30:00+05:30"
+    },
+    {
+      "_id": "truck_009",
+      "truck_number": "DL04GH3456",
+      "plate_image": "plate_DL04GH3456_20240802_002.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.93,
+          "x": 285,
+          "y": 82,
+          "width": 112,
+          "height": 31
+        }
+      ],
+      "last_updated": "2024-08-02T09:45:00+05:30"
+    },
+    {
+      "_id": "truck_010",
+      "truck_number": "KA05IJ7890",
+      "plate_image": "plate_KA05IJ7890_20240802_003.jpg",
+      "plate_predictions": [
+        {
+          "class": "License Plate",
+          "confidence": 0.89,
+          "x": 275,
+          "y": 78,
+          "width": 118,
+          "height": 33
+        }
+      ],
+      "last_updated": "2024-08-02T10:20:00+05:30"
+    }
+  ],
+  "scrap_records": [
+    {
+      "_id": "scrap_001",
+      "timestamp": "2024-08-01T09:00:00+05:30",
+      "scrap_image": "scrap_crc_20240801_001.jpg",
+      "scrap_predictions": [
+        {
+          "class": "CRC",
+          "confidence": 0.95,
+          "x": 250,
+          "y": 300,
+          "width": 150,
+          "height": 120
+        }
+      ],
+      "truck_number": "MH01AB1234"
+    },
+    {
+      "_id": "scrap_002",
+      "timestamp": "2024-08-01T10:30:00+05:30",
+      "scrap_image": "scrap_burada_20240801_002.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Burada",
+          "confidence": 0.88,
+          "x": 200,
+          "y": 250,
+          "width": 180,
+          "height": 140
+        }
+      ],
+      "truck_number": "DL02CD5678"
+    },
+    {
+      "_id": "scrap_003",
+      "timestamp": "2024-08-01T11:15:00+05:30",
+      "scrap_image": "scrap_k2_20240801_003.jpg",
+      "scrap_predictions": [
+        {
+          "class": "K2",
+          "confidence": 0.97,
+          "x": 300,
+          "y": 280,
+          "width": 160,
+          "height": 130
+        }
+      ],
+      "truck_number": "KA03EF9012"
+    },
+    {
+      "_id": "scrap_004",
+      "timestamp": "2024-08-01T12:00:00+05:30",
+      "scrap_image": "scrap_selected_20240801_004.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Selected",
+          "confidence": 0.96,
+          "x": 220,
+          "y": 320,
+          "width": 140,
+          "height": 110
+        }
+      ],
+      "truck_number": "TN04GH3456"
+    },
+    {
+      "_id": "scrap_005",
+      "timestamp": "2024-08-01T13:45:00+05:30",
+      "scrap_image": "scrap_piece_to_piece_20240801_005.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Piece to Piece",
+          "confidence": 0.87,
+          "x": 180,
+          "y": 240,
+          "width": 120,
+          "height": 90
+        }
+      ],
+      "truck_number": "AP05IJ7890"
+    },
+    {
+      "_id": "scrap_006",
+      "timestamp": "2024-08-01T14:30:00+05:30",
+      "scrap_image": "scrap_melting_20240801_006.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Melting",
+          "confidence": 0.82,
+          "x": 160,
+          "y": 200,
+          "width": 200,
+          "height": 150
+        }
+      ],
+      "truck_number": "GJ01AB1234"
+    },
+    {
+      "_id": "scrap_007",
+      "timestamp": "2024-08-01T15:15:00+05:30",
+      "scrap_image": "scrap_sponge_iron_20240801_007.jpg",
+      "scrap_predictions": [
+        {
+          "class": "Sponge Iron",
+          "confidence": 0.90,
+          "x": 240,
+          "y": 260,
+          "width": 170,
+          "height": 140
+        }
+      ],
+      "truck_number": "UP02CD5678"
+    }
+  ]
+}

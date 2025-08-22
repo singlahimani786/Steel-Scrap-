@@ -6,10 +6,31 @@ import pytesseract
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
+from datetime import datetime
+from bson import ObjectId
 
 load_dotenv()
 
 api_key = os.getenv("API_KEY")
+
+def serialize_mongodb_doc(doc):
+    """
+    Recursively serializes a MongoDB document, converting:
+    - ObjectId to string
+    - datetime to ISO format string
+    - Handles nested dictionaries and lists
+    """
+    if isinstance(doc, dict):
+        for key, value in doc.items():
+            if isinstance(value, ObjectId):
+                doc[key] = str(value)
+            elif isinstance(value, datetime):
+                doc[key] = value.isoformat()
+            elif isinstance(value, (dict, list)):
+                doc[key] = serialize_mongodb_doc(value)
+    elif isinstance(doc, list):
+        return [serialize_mongodb_doc(item) for item in doc]
+    return doc
 
 def get_inference(image_path, project, version):
     with open(image_path, 'rb') as img_file:

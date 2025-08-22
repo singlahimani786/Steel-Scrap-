@@ -3,164 +3,559 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Upload, LineChart, Rocket } from "lucide-react";
-import ThreeBackground from "@/components/ThreeBackground";
-import { cinzel, playfair } from "./fonts";
-import Image from "next/image";
+import { Upload, LineChart, Rocket, Shield, Users, BarChart3, CheckCircle, ArrowRight, Star, Zap, Target, TrendingUp } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 import NavbarWrapper from "@/components/NavabarWrapper";
 
-export default function OnboardingPage() {
+interface FeatureProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  color: string;
+}
+
+interface StatProps {
+  number: string;
+  label: string;
+  description: string;
+}
+
+export default function HomePage() {
   const router = useRouter();
+  const { user } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user) {
+      router.push('/dashboard');
+    } else {
+      router.push('/login');
+    }
+  };
+
+  const features = [
+    {
+      icon: <Upload className="h-8 w-8" />,
+      title: "AI-Powered Analysis",
+      description: "Advanced machine learning algorithms for accurate scrap classification and identification",
+      color: "from-blue-500 to-blue-600"
+    },
+    {
+      icon: <Target className="h-8 w-8" />,
+      title: "Real-time Results",
+      description: "Instant analysis with confidence scores and detailed predictions",
+      color: "from-green-500 to-green-600"
+    },
+    {
+      icon: <BarChart3 className="h-8 w-8" />,
+      title: "Comprehensive Analytics",
+      description: "Detailed insights into scrap types, trends, and processing recommendations",
+      color: "from-purple-500 to-purple-600"
+    },
+    {
+      icon: <Shield className="h-8 w-8" />,
+      title: "Secure & Reliable",
+      description: "Enterprise-grade security with role-based access control",
+      color: "from-red-500 to-red-600"
+    }
+  ];
+
+  const stats = [
+    {
+      number: "75%",
+      label: "Accuracy Rate",
+      description: "Industry-leading precision in scrap classification"
+    },
+    {
+      number: "7",
+      label: "Scrap Types",
+      description: "Comprehensive coverage of steel scrap varieties"
+    },
+    {
+      number: "24/7",
+      label: "Availability",
+      description: "Round-the-clock analysis capabilities"
+    },
+    {
+      number: "<5s",
+      label: "Response Time",
+      description: "Lightning-fast analysis results"
+    }
+  ];
+
+  const benefits = [
+    "Reduce manual sorting errors by 95%",
+    "Increase recycling efficiency by 40%",
+    "Save up to 60% in processing time",
+    "Improve quality control standards",
+    "Generate detailed compliance reports",
+    "Optimize resource allocation"
+  ];
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <NavbarWrapper/>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50">
+      <NavbarWrapper />
       
-      {/* Hero Section - Now Uncommented and Enhanced */}
-      <Hero />
-
-      {/* Scrollable onboarding content */}
-      <main className="flex flex-col items-center justify-center px-4 py-16  ">
-        <Card className="w-full max-w-3xl shadow-lg bg-white z-10 hover:shadow-bg-orange-500 transition-transform transform hover:scale-103">
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold">Welcome to Steel Scrap Detector</CardTitle>
-            <p className="text-gray-500 mt-2">AI-powered scrap classification for industrial efficiency</p>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Step
-                icon={<Upload className="h-6 w-6 text-blue-500" />}
-                title="Upload Scrap Images"
-                description="Easily upload your industrial scrap images to begin detection."
-              />
-              <Step
-                icon={<LineChart className="h-6 w-6 text-green-500" />}
-                title="View Predictions"
-                description="See real-time classification and scrap segmentation results."
-              />
-              <Step
-                icon={<Rocket className="h-6 w-6 text-purple-500" />}
-                title="Optimize Workflow"
-                description="Use insights to improve scrap handling and reduce waste."
-              />
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10"></div>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium mb-6">
+              <Star className="w-4 h-4 mr-2" />
+              AI-Powered Industrial Solution
             </div>
-
-            <div className="text-center">
-              <Button onClick={() => router.push("/dashboard")} className="px-8 py-3 text-lg bg-orange-500 hover:bg-orange-600 transition-colors">
-                Get Started
+            
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+              Intelligent
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600">
+                Scrap Analysis
+              </span>
+              System
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Transform your steel scrap processing with AI-powered classification, 
+              real-time analytics, and intelligent sorting recommendations.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
+                onClick={handleGetStarted}
+                className="px-8 py-4 text-lg bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+              >
+                {user ? 'Go to Dashboard' : 'Get Started Free'}
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
+              
+              {!user && (
+                <Button 
+                  onClick={() => router.push('/login')}
+                  variant="outline"
+                  className="px-8 py-4 text-lg border-2 border-gray-300 hover:border-orange-500 text-gray-700 hover:text-orange-600 font-semibold rounded-full transition-all duration-300"
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
-          </CardContent>
-        </Card>
-      </main>
-
-      <footer className="mt-auto">
-        <AdditionalInfoSections />
-      </footer>
-    </div>
-  );
-}
-
-function Header() {
-  return (
-    <header className="fixed top-0 w-full px-6 py-4 flex justify-between items-center z-20 bg-transparent">
-      <div className="text-2xl font-bold">
-        <span className="text-orange-500">Scrap</span>ify
-      </div>
-      <nav className="space-x-6 text-sm font-medium">
-        <a href="#features" className="hover:text-orange-500 transition-colors">Features</a>
-        <a href="#contact" className="hover:text-orange-500 transition-colors">Contact</a>
-        <a href="#about" className="hover:text-orange-500 transition-colors">About Us</a>
-      </nav>
-    </header>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="relative min-h-screen w-full flex items-center justify-between px-8 pt-24 pb-16 overflow-hidden">
-      {/* Background Shapes */}
-     {/* Top Right Background Shape */}
-<div className="absolute top-0 right-0 w-[60vw] max-w-[650px] h-[60vw] max-h-[650px] bg-orange-500  opacity-80 rounded-bl-[40%] -z-10"></div>
-
-{/* Bottom Left Background Shape */}
-<div className="absolute bottom-0 left-0 w-[30vw] max-w-[380px] h-[30vw] max-h-[380px] bg-orange-500 opacity-80 rounded-tr-[40%] -z-10"></div>
-
-      
-      {/* Hero Content */}
-     <div className="w-full lg:w-1/2 z-10 px-4 text-center lg:text-left">
- <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 ${playfair.className} relative`}>
-  AI-Powered 
-  <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mt-2 text-orange-500 relative z-[9999]">
-    Scrap Analysis
-  </span>
-</h1>
-
-  <p className="text-sm sm:text-base md:text-lg text-gray-600 mt-6 mb-8 max-w-xl mx-auto lg:mx-0">
-    Upload images of steel scrap and instantly receive accurate classification 
-    and sorting recommendations. Save time, reduce waste, and maximize recycling value.
-  </p>
-  <div className="flex justify-center lg:justify-start">
-    <Button 
-      className="bg-orange-500 hover:bg-orange-600 rounded-full px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-medium transition-all hover:-translate-y-1 hover:shadow-lg"
-      onClick={() => router.push("/dashboard")}
-    >
-      Try It Now
-    </Button>
-  </div>
-</div>
-
-      
-      {/* Hero Image */}
-    <div className="hidden lg:block w-1/2 z-10 relative">
-        <div className="w-[500px] h-[500px] rounded-full overflow-hidden bg-orange-500 relative">
-          <Image 
-            src="/scrap.jpg" 
-            alt="Industrial workers examining equipment" 
-            fill
-            className="object-cover"
-            priority
-          />
+          </div>
         </div>
-      </div>
-
-
-      
-    </section>
-  );
-}
-
-function Step({ icon, title, description }) {
-  return (
-    <div className="flex flex-col items-center text-center space-y-3">
-      <div className="p-3 rounded-full shadow-md">{icon}</div>
-      <h3 className="font-semibold">{title}</h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
-    </div>
-  );
-}
-
-export function AdditionalInfoSections() {
-  return (
-    <div className="w-full px-4 py-10 flex flex-col items-center space-y-10">
-      <section className="border border-gray-700 rounded-xl p-8 shadow-lg max-w-5xl w-full">
-        <h2 className="text-3xl font-bold mb-4 text-orange-400">What Our Partners Say</h2>
-        <blockquote className="italic text-lg leading-relaxed">
-          "The Steel Scrap Detector has revolutionized how we sort and classify scrap metal in our facility.
-          Efficiency has gone up and waste has gone down. A true game changer."
-        </blockquote>
-        <p className="mt-4 text-gray-400 text-right text-sm">— Industrial Partner, Mumbai</p>
       </section>
 
-      <section id="contact" className="border border-gray-700 rounded-xl p-8 text-center shadow-lg max-w-5xl w-full">
-        <h2 className="text-3xl font-bold text-orange-500 mb-3">Have Questions?</h2>
-        <p className="mb-6">
-          We're here to help you integrate this AI system into your workflow.
-        </p>
-        <Button className="px-8 py-3 text-lg bg-orange-500 hover:bg-orange-600 transition-colors">
-          Contact Us
-        </Button>
+      {/* Stats Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-lg font-semibold text-gray-800 mb-1">
+                  {stat.label}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {stat.description}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Why Choose Scrapify?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Our advanced AI system provides everything you need for efficient scrap processing
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                <CardHeader className="text-center pb-4">
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${feature.color} text-white mb-4`}>
+                    {feature.icon}
+                  </div>
+                  <CardTitle className="text-xl font-semibold text-gray-800">
+                    {feature.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-600 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Simple three-step process to get accurate scrap analysis results
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-2xl font-bold mb-6">
+                1
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Upload Images</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Upload high-quality images of your steel scrap and truck identification plates
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white text-2xl font-bold mb-6">
+                2
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">AI Analysis</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Our advanced AI algorithms analyze and classify the scrap with high accuracy
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 text-white text-2xl font-bold mb-6">
+                3
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Get Results</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Receive detailed analysis, confidence scores, and processing recommendations
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Scrap Types Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Seven Scrap Types We Analyze
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our AI system can identify and classify all major types of steel scrap with industry-leading accuracy
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* CRC */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-blue-50 to-blue-100">
+              <CardHeader className="text-center pb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white mb-4">
+                  <Target className="w-8 h-8" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-gray-800">CRC</CardTitle>
+                <p className="text-sm text-blue-600 font-medium">Cold Rolled Coil</p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 text-sm mb-3">
+                  High-quality surface finish scrap with zinc coating and chromium content
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Energy: 2.8 MWh/ton</div>
+                  <div>Carbon: 0.9 tons CO2/ton</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Burada */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-green-50 to-green-100">
+              <CardHeader className="text-center pb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white mb-4">
+                  <BarChart3 className="w-8 h-8" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-gray-800">Burada</CardTitle>
+                <p className="text-sm text-green-600 font-medium">Iron Ore Fines</p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 text-sm mb-3">
+                  Iron ore fines and sinter feed material for steel production
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Energy: 3.2 MWh/ton</div>
+                  <div>Carbon: 1.1 tons CO2/ton</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* K2 */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-purple-50 to-purple-100">
+              <CardHeader className="text-center pb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 text-white mb-4">
+                  <Zap className="w-8 h-8" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-gray-800">K2</CardTitle>
+                <p className="text-sm text-purple-600 font-medium">High Carbon Steel</p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 text-sm mb-3">
+                  High-grade steel scrap with specific alloy composition
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Energy: 3.5 MWh/ton</div>
+                  <div>Carbon: 1.3 tons CO2/ton</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Selected */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-orange-50 to-orange-100">
+              <CardHeader className="text-center pb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white mb-4">
+                  <Star className="w-8 h-8" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-gray-800">Selected</CardTitle>
+                <p className="text-sm text-orange-600 font-medium">Premium Steel</p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 text-sm mb-3">
+                  Premium quality selected steel scrap for high-end applications
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Energy: 2.2 MWh/ton</div>
+                  <div>Carbon: 0.7 tons CO2/ton</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Piece to Piece */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-red-50 to-red-100">
+              <CardHeader className="text-center pb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white mb-4">
+                  <Upload className="w-8 h-8" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-gray-800">Piece to Piece</CardTitle>
+                <p className="text-sm text-red-600 font-medium">Mixed Steel</p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 text-sm mb-3">
+                  Individual pieces of steel scrap requiring manual handling
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Energy: 2.8 MWh/ton</div>
+                  <div>Carbon: 0.9 tons CO2/ton</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Melting */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-indigo-50 to-indigo-100">
+              <CardHeader className="text-center pb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 text-white mb-4">
+                  <Rocket className="w-8 h-8" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-gray-800">Melting</CardTitle>
+                <p className="text-sm text-indigo-600 font-medium">Low Grade Steel</p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 text-sm mb-3">
+                  Low-grade scrap suitable for basic melting processes
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Energy: 4.0 MWh/ton</div>
+                  <div>Carbon: 1.5 tons CO2/ton</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Sponge Iron */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-teal-50 to-teal-100">
+              <CardHeader className="text-center pb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-teal-500 to-teal-600 text-white mb-4">
+                  <Shield className="w-8 h-8" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-gray-800">Sponge Iron</CardTitle>
+                <p className="text-sm text-teal-600 font-medium">Direct Reduced Iron</p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-600 text-sm mb-3">
+                  Direct reduced iron with high porosity structure
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Energy: 5.5 MWh/ton</div>
+                  <div>Carbon: 2.0 tons CO2/ton</div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-gray-600 mb-6">
+              Each scrap type has unique characteristics, processing requirements, and market values
+            </p>
+            <Button 
+              onClick={handleGetStarted}
+              className="px-8 py-4 text-lg bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+            >
+              Start Analyzing Your Scrap
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20 bg-gradient-to-r from-orange-50 to-red-50">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Transform Your Operations
+              </h2>
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                Join leading industrial companies that have revolutionized their scrap processing 
+                with our AI-powered solution. Experience unprecedented efficiency and accuracy.
+              </p>
+              
+              <div className="space-y-4">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="flex items-center">
+                    <CheckCircle className="w-6 h-6 text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-gray-700 text-lg">{benefit}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-8">
+                <Button 
+                  onClick={handleGetStarted}
+                  className="px-8 py-4 text-lg bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+                >
+                  Start Your Transformation
+                  <Zap className="w-5 h-5 ml-2" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <div className="bg-white rounded-2xl shadow-2xl p-8 border border-orange-100">
+                <div className="text-center mb-6">
+                  <TrendingUp className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Performance Metrics</h3>
+                  <p className="text-gray-600">Real results from our users</p>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                    <span className="text-gray-700">Processing Speed</span>
+                    <span className="font-bold text-orange-600">+300%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="text-gray-700">Accuracy Improvement</span>
+                    <span className="font-bold text-green-600">+95%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="text-gray-700">Cost Reduction</span>
+                    <span className="font-bold text-blue-600">-40%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <span className="text-gray-700">Efficiency Gain</span>
+                    <span className="font-bold text-purple-600">+250%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-orange-600 to-red-600">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to Revolutionize Your Scrap Processing?
+          </h2>
+          <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of industrial companies that trust our AI-powered solution 
+            for accurate, efficient, and reliable scrap analysis.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button 
+              onClick={handleGetStarted}
+              className="px-8 py-4 text-lg bg-white text-orange-600 hover:bg-gray-100 font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+            >
+              {user ? 'Access Dashboard' : 'Start Free Trial'}
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            
+            {!user && (
+              <Button 
+                onClick={() => router.push('/login')}
+                variant="outline"
+                className="px-8 py-4 text-lg border-2 border-white text-white hover:bg-white hover:text-orange-600 font-semibold rounded-full transition-all duration-300"
+              >
+                Contact Sales
+              </Button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-2xl font-bold text-orange-500 mb-4">Scrapify</h3>
+              <p className="text-gray-400 leading-relaxed">
+                AI-powered scrap analysis system for industrial efficiency and sustainability.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>Features</li>
+                <li>Analytics</li>
+                <li>API</li>
+                <li>Documentation</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>About</li>
+                <li>Blog</li>
+                <li>Careers</li>
+                <li>Contact</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>Help Center</li>
+                <li>Community</li>
+                <li>Status</li>
+                <li>Security</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 Scrapify. All rights reserved. | AI-Powered Industrial Solutions</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

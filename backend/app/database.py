@@ -10,3 +10,4 @@ db = client["steel_scrap_db"]
 
 truck_collection = db["truck_records"]
 scrap_collection = db["scrap_records"]
+analysis_history_collection = db["analysis_history"]

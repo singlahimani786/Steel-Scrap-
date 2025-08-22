@@ -77,12 +77,21 @@ export default function OwnerDashboard() {
         axios.get(`${backendUrl}/owner/stats?factory_id=${user.factory_id}`)
       ]);
       
+      console.log('🔍 Owner labourers response:', labourersResponse.data);
+      console.log('🔍 Owner stats response:', statsResponse.data);
+      
       if ((labourersResponse.data as any).status === "success") {
+        console.log('✅ Setting labourers:', (labourersResponse.data as any).labourers);
         setLabourers((labourersResponse.data as any).labourers);
+      } else {
+        console.log('❌ Labourers response not successful:', labourersResponse.data);
       }
       
       if ((statsResponse.data as any).status === "success") {
+        console.log('✅ Setting stats:', (statsResponse.data as any).stats);
         setStats((statsResponse.data as any).stats);
+      } else {
+        console.log('❌ Stats response not successful:', statsResponse.data);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);

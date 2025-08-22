@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import NavbarWrapper from "@/components/NavabarWrapper";
 import LayoutWrapper from "@/components/layout-wrapper";
 import ProtectedRoute from "@/components/protected-route";
+import { useAuth } from "@/lib/auth-context";
 import axios from 'axios';
 import { Plus, Users, Building2, Eye, Edit, Trash2, UserPlus, Shield } from 'lucide-react';
 
@@ -28,6 +29,7 @@ interface SystemStats {
 }
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [owners, setOwners] = useState<FactoryOwner[]>([]);
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,8 +45,17 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user?.role === 'admin') {
+      fetchData();
+    }
+  }, [user]);
+
+  // Debug logging for state variables
+  useEffect(() => {
+    console.log('🔍 Current owners state:', owners);
+    console.log('🔍 Current stats state:', stats);
+    console.log('🔍 Current loading state:', loading);
+  }, [owners, stats, loading]);
 
   const fetchData = async () => {
     try {
@@ -55,12 +66,21 @@ export default function AdminDashboard() {
         axios.get(`${backendUrl}/admin/stats`)
       ]);
       
+      console.log('🔍 Admin owners response:', ownersResponse.data);
+      console.log('🔍 Admin stats response:', statsResponse.data);
+      
       if ((ownersResponse.data as any).status === "success") {
+        console.log('✅ Setting owners:', (ownersResponse.data as any).owners);
         setOwners((ownersResponse.data as any).owners);
+      } else {
+        console.log('❌ Owners response not successful:', ownersResponse.data);
       }
       
       if ((statsResponse.data as any).status === "success") {
+        console.log('✅ Setting stats:', (statsResponse.data as any).stats);
         setStats((statsResponse.data as any).stats);
+      } else {
+        console.log('❌ Stats response not successful:', statsResponse.data);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);

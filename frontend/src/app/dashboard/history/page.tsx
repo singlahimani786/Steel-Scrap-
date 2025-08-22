@@ -52,7 +52,6 @@ export default function HistoryPage() {
       console.error("No factory ID available");
       return;
     }
-
     try {
       setLoading(true);
       const url = user?.role === 'admin' 

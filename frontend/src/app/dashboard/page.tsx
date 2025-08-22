@@ -178,33 +178,15 @@ export default function Dashboard() {
     }
   };
 
-  // For labourers, show only the upload section
-  if (user && user.role === 'labourer') {
-    return (
-      <ProtectedRoute requiredRole="labourer">
-        <LayoutWrapper>
-          <NavbarWrapper />
-          <div className="container mx-auto px-6 py-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">Upload Scrap Images</h1>
-                <p className="text-gray-600">Upload scrap and truck images for analysis</p>
-              </div>
-              
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                <DashboardUpload
-                  scrapImage={scrapImage}
-                  setScrapImage={setScrapImage}
-                  truckImage={truckImage}
-                  setTruckImage={setTruckImage}
-                  onSubmit={handleSubmit}
-                />
-              </div>
-            </div>
-          </div>
-        </LayoutWrapper>
-      </ProtectedRoute>
-    );
+  // For labourers, redirect to the labourer dashboard
+  useEffect(() => {
+    if (user && user.role === 'labourer') {
+      router.push('/dashboard/labourer');
+    }
+  }, [user, router]);
+
+  if (user?.role === 'labourer') {
+    return null;
   }
 
   // For admin/owner, show full dashboard

@@ -287,57 +287,7 @@ export default function AnalyticsPage() {
     }));
   }, [analyticsData, filtered]);
 
-  const yearlyTrend = useMemo(() => {
-    // Use real data when available, otherwise use mock data
-    if (analyticsData?.daily_data && range === 'all') {
-      return analyticsData.daily_data.map((day: any) => {
-        const dayData: any = { date: day._id };
-        day.types.forEach((type: any) => {
-          dayData[type.type] = type.count;
-        });
-        return dayData;
-      });
-    }
-    return MOCK_YEAR_DATA;
-  }, [analyticsData, range]);
 
-  const monthlyAggregated = useMemo(() => {
-    // Use real data when available, otherwise use mock data
-    if (analyticsData?.daily_data && range === 'all') {
-      const monthly: Record<string, Record<string, number>> = {};
-      
-      analyticsData.daily_data.forEach((day: any) => {
-        const monthKey = day._id.slice(0, 7);
-        if (!monthly[monthKey]) monthly[monthKey] = {};
-        
-        day.types.forEach((type: any) => {
-          monthly[monthKey][type.type] = (monthly[monthKey][type.type] || 0) + type.count;
-        });
-      });
-      
-      return Object.entries(monthly).map(([month, data]) => ({
-        month,
-        ...data
-      }));
-    }
-    
-    // Fallback to mock data
-    const monthly: Record<string, Record<string, number>> = {};
-    
-    MOCK_YEAR_DATA.forEach(day => {
-      const monthKey = day.date.slice(0, 7);
-      if (!monthly[monthKey]) monthly[monthKey] = {};
-      
-      Object.keys(SCRAP_TYPE_DETAILS).forEach(type => {
-        monthly[monthKey][type] = (monthly[monthKey][type] || 0) + (day[type] || 0);
-      });
-    });
-    
-    return Object.entries(monthly).map(([month, data]) => ({
-      month,
-      ...data
-    }));
-  }, [analyticsData, range]);
 
   const selectedTypeData = useMemo(() => {
     if (!selectedType) return null;
@@ -347,14 +297,9 @@ export default function AnalyticsPage() {
       const typeRecord = analyticsData.type_counts.find((t: any) => t._id === selectedType);
       if (typeRecord) {
         const typeDetails = scrapTypeDetails?.find((t: any) => t.name === selectedType);
-        const totalWeight = typeRecord.count * 2.5;
-        const totalValue = totalWeight * (typeDetails?.price || 0);
-        
         return {
           count: typeRecord.count,
           uniqueTrucks: Math.floor(typeRecord.count * 0.3), // Estimate unique trucks
-          totalWeight,
-          totalValue,
           details: typeDetails || SCRAP_TYPE_DETAILS[selectedType as keyof typeof SCRAP_TYPE_DETAILS]
         };
       }
@@ -372,27 +317,18 @@ export default function AnalyticsPage() {
       typeRecords = Array(mockCount).fill(null);
       
       const uniqueTrucks = mockTrucks;
-      const totalWeight = mockCount * 2.5;
-      const totalValue = totalWeight * (SCRAP_TYPE_DETAILS[selectedType as keyof typeof SCRAP_TYPE_DETAILS]?.price || 0);
-      
       return {
         count: mockCount,
         uniqueTrucks,
-        totalWeight,
-        totalValue,
         details: SCRAP_TYPE_DETAILS[selectedType as keyof typeof SCRAP_TYPE_DETAILS]
       };
     }
 
     const uniqueTrucks = new Set(typeRecords.map(r => r.truck_number));
-    const totalWeight = typeRecords.length * 2.5;
-    const totalValue = totalWeight * (SCRAP_TYPE_DETAILS[selectedType as keyof typeof SCRAP_TYPE_DETAILS]?.price || 0);
     
     return {
       count: typeRecords.length,
       uniqueTrucks: uniqueTrucks.size,
-      totalWeight,
-      totalValue,
       details: SCRAP_TYPE_DETAILS[selectedType as keyof typeof SCRAP_TYPE_DETAILS]
     };
   }, [selectedType, filtered, analyticsData, scrapTypeDetails]);
@@ -678,14 +614,7 @@ export default function AnalyticsPage() {
                           <span className="text-gray-600">Unique Trucks:</span>
                           <span className="font-semibold">{selectedTypeData.uniqueTrucks}</span>
                         </div>
-                        <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                          <span className="text-gray-600">Estimated Weight:</span>
-                          <span className="font-semibold">{selectedTypeData.totalWeight.toFixed(1)} tons</span>
-                        </div>
-                        <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                          <span className="text-gray-600">Estimated Value:</span>
-                          <span className="font-semibold">₹{selectedTypeData.totalValue.toLocaleString()}</span>
-                        </div>
+
                       </div>
                     </div>
 
@@ -693,10 +622,7 @@ export default function AnalyticsPage() {
                     <div>
                       <h4 className="font-semibold text-gray-800 mb-4">Processing Information</h4>
                       <div className="space-y-3">
-                        <div className="p-3 bg-blue-50 rounded-lg">
-                          <div className="text-sm text-gray-600 mb-1">Price per Ton</div>
-                          <div className="text-lg font-bold text-blue-700">₹{selectedTypeData.details?.price?.toLocaleString()}</div>
-                        </div>
+
                         <div className="p-3 bg-green-50 rounded-lg">
                           <div className="text-sm text-gray-600 mb-1">Energy Required</div>
                           <div className="text-lg font-bold text-green-700">{selectedTypeData.details?.energyRequired}</div>
@@ -814,70 +740,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            {/* Yearly Trend Chart */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
-              <div className="p-4 border-b">
-                <h3 className="font-semibold text-gray-800">Yearly Trend Analysis (2024) - All 7 Scrap Types</h3>
-              </div>
-              <div className="p-6 h-[500px]">
-                {yearlyTrend.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={yearlyTrend}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="date" 
-                        tick={{ fontSize: 10 }} 
-                        interval={Math.floor(yearlyTrend.length / 12)} // Show ~12 labels
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
-                      />
-                      <YAxis allowDecimals={false} />
-                      <Tooltip />
-                      <Legend />
-                      {Object.keys(SCRAP_TYPE_DETAILS).map((type: string, i: number) => (
-                        <Line 
-                          key={type} 
-                          type="monotone" 
-                          dataKey={type} 
-                          stroke={COLORS[i % COLORS.length]} 
-                          dot={false} 
-                          strokeWidth={2}
-                          name={type}
-                        />
-                      ))}
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500">No data</div>
-                )}
-              </div>
-            </div>
 
-            {/* Monthly Aggregated Chart */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
-              <div className="p-4 border-b">
-                <h3 className="font-semibold text-gray-800">Monthly Aggregated Data (2024)</h3>
-              </div>
-              <div className="p-6 h-[420px]">
-                {monthlyAggregated.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyAggregated}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                      <YAxis allowDecimals={false} />
-                      <Tooltip />
-                      <Legend />
-                      {Object.keys(SCRAP_TYPE_DETAILS).map((type: string, i: number) => (
-                        <Bar key={type} dataKey={type} stackId="a" fill={COLORS[i % COLORS.length]} />
-                      ))}
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500">No data</div>
-                )}
-              </div>
-            </div>
 
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
               <div className="p-4 border-b">

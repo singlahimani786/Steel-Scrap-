@@ -2,12 +2,26 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
   email: string;
   role: 'admin' | 'owner' | 'labourer';
-  factory_id?: string;  // Optional field for owners and labourers
+  factory_id?: string;
+  owner_id?: string;
+  name?: string;
+  employee_id?: string;
+  department?: string;
+  factory_name?: string;
+  factory_type?: string;
+}
+
+interface AuthResponse {
+  status: 'success' | 'error';
+  user?: User;
+  session_token?: string;
+  message?: string;
 }
 
 interface AuthContextType {
@@ -25,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   // Check for existing session on mount
   useEffect(() => {
@@ -38,11 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const verifySession = async (token: string) => {
     try {
-      const response = await axios.post('http://localhost:5001/auth/verify', {
+      const response = await axios.post<AuthResponse>('http://localhost:5001/auth/verify', {
         session_token: token
       });
       
-      if (response.data.status === 'success') {
+      if (response.data.status === 'success' && response.data.user) {
         setUser(response.data.user);
         setSessionToken(token);
         localStorage.setItem('session_token', token);
@@ -59,59 +74,88 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string, role: 'admin' | 'owner' | 'labourer'): Promise<{ success: boolean; message?: string }> => {
     try {
-      const response = await axios.post('http://localhost:5001/auth/login', {
+      const response = await axios.post<AuthResponse>('http://localhost:5001/auth/login', {
         email,
         password,
         role
       });
 
-      if (response.data.status === 'success') {
-        setUser(response.data.user);
-        setSessionToken(response.data.session_token);
-        localStorage.setItem('session_token', response.data.session_token);
+      if (response.data.status === 'success' && response.data.user && response.data.session_token) {
+        // Store user data and session token
+        const userData = response.data.user;
+        const token = response.data.session_token;
+        
+        // Save to state
+        setUser(userData);
+        setSessionToken(token);
+        
+        // Save to localStorage
+        localStorage.setItem('session_token', token);
+        
+        // Redirect based on role
+        switch (userData.role) {
+          case 'admin':
+            router.push('/admin');
+            break;
+          case 'owner':
+            router.push('/owner');
+            break;
+          case 'labourer':
+            router.push('/dashboard/labourer');
+            break;
+        }
+
         return { success: true };
       }
       return { success: false, message: response.data.message || 'Login failed' };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login failed:', error);
-      if (error.response?.status === 401) {
-        return { success: false, message: 'Invalid credentials. Please check your email, password, and role, or register a new account.' };
-      } else if (error.response?.status === 403) {
-        return { success: false, message: 'Role mismatch. Please select the correct role for your account.' };
-      } else if (error.code === 'ECONNREFUSED') {
-        return { success: false, message: 'Cannot connect to server. Please check if the backend is running.' };
-      } else {
-        return { success: false, message: error.response?.data?.message || 'Login failed. Please try again.' };
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number; data?: { message?: string } }; code?: string };
+        if (axiosError.response?.status === 401) {
+          return { success: false, message: 'Invalid credentials. Please check your email, password, and role, or register a new account.' };
+        } else if (axiosError.response?.status === 403) {
+          return { success: false, message: 'Role mismatch. Please select the correct role for your account.' };
+        } else if (axiosError.code === 'ECONNREFUSED') {
+          return { success: false, message: 'Cannot connect to server. Please check if the backend is running.' };
+        } else {
+          return { success: false, message: axiosError.response?.data?.message || 'Login failed. Please try again.' };
+        }
       }
+      return { success: false, message: 'An unexpected error occurred' };
     }
   };
 
   const register = async (email: string, password: string, role: 'admin' | 'owner' | 'labourer'): Promise<{ success: boolean; message?: string }> => {
     try {
-      const response = await axios.post('http://localhost:5001/auth/register', {
+      const response = await axios.post<AuthResponse>('http://localhost:5001/auth/register', {
         email,
         password,
         role
       });
 
-      if (response.data.status === 'success') {
+      if (response.data.status === 'success' && response.data.user && response.data.session_token) {
         setUser(response.data.user);
         setSessionToken(response.data.session_token);
         localStorage.setItem('session_token', response.data.session_token);
         return { success: true };
       }
       return { success: false, message: response.data.message || 'Registration failed' };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Registration failed:', error);
-      if (error.response?.status === 409) {
-        return { success: false, message: 'User already exists with this email. Please try logging in instead.' };
-      } else if (error.response?.status === 400) {
-        return { success: false, message: 'Invalid data provided. Please check your email, password, and role.' };
-      } else if (error.code === 'ECONNREFUSED') {
-        return { success: false, message: 'Cannot connect to server. Please check if the backend is running.' };
-      } else {
-        return { success: false, message: error.response?.data?.message || 'Registration failed. Please try again.' };
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number; data?: { message?: string } }; code?: string };
+        if (axiosError.response?.status === 409) {
+          return { success: false, message: 'User already exists with this email. Please try logging in instead.' };
+        } else if (axiosError.response?.status === 400) {
+          return { success: false, message: 'Invalid data provided. Please check your email, password, and role.' };
+        } else if (axiosError.code === 'ECONNREFUSED') {
+          return { success: false, message: 'Cannot connect to server. Please check if the backend is running.' };
+        } else {
+          return { success: false, message: axiosError.response?.data?.message || 'Registration failed. Please try again.' };
+        }
       }
+      return { success: false, message: 'An unexpected error occurred' };
     }
   };
 

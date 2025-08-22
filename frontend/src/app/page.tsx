@@ -61,7 +61,7 @@ export default function HomePage() {
 
   const stats = [
     {
-      number: "99.2%",
+      number: "75%",
       label: "Accuracy Rate",
       description: "Industry-leading precision in scrap classification"
     },
@@ -76,7 +76,7 @@ export default function HomePage() {
       description: "Round-the-clock analysis capabilities"
     },
     {
-      number: "<2s",
+      number: "<5s",
       label: "Response Time",
       description: "Lightning-fast analysis results"
     }
@@ -269,7 +269,6 @@ export default function HomePage() {
                   High-quality surface finish scrap with zinc coating and chromium content
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <div>Price: ₹52,000/ton</div>
                   <div>Energy: 2.8 MWh/ton</div>
                   <div>Carbon: 0.9 tons CO2/ton</div>
                 </div>
@@ -290,7 +289,6 @@ export default function HomePage() {
                   Iron ore fines and sinter feed material for steel production
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <div>Price: ₹38,000/ton</div>
                   <div>Energy: 3.2 MWh/ton</div>
                   <div>Carbon: 1.1 tons CO2/ton</div>
                 </div>
@@ -311,7 +309,6 @@ export default function HomePage() {
                   High-grade steel scrap with specific alloy composition
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <div>Price: ₹65,000/ton</div>
                   <div>Energy: 3.5 MWh/ton</div>
                   <div>Carbon: 1.3 tons CO2/ton</div>
                 </div>
@@ -332,7 +329,6 @@ export default function HomePage() {
                   Premium quality selected steel scrap for high-end applications
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <div>Price: ₹75,000/ton</div>
                   <div>Energy: 2.2 MWh/ton</div>
                   <div>Carbon: 0.7 tons CO2/ton</div>
                 </div>
@@ -353,7 +349,6 @@ export default function HomePage() {
                   Individual pieces of steel scrap requiring manual handling
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <div>Price: ₹42,000/ton</div>
                   <div>Energy: 2.8 MWh/ton</div>
                   <div>Carbon: 0.9 tons CO2/ton</div>
                 </div>
@@ -374,7 +369,6 @@ export default function HomePage() {
                   Low-grade scrap suitable for basic melting processes
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <div>Price: ₹35,000/ton</div>
                   <div>Energy: 4.0 MWh/ton</div>
                   <div>Carbon: 1.5 tons CO2/ton</div>
                 </div>
@@ -395,7 +389,6 @@ export default function HomePage() {
                   Direct reduced iron with high porosity structure
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <div>Price: ₹28,000/ton</div>
                   <div>Energy: 5.5 MWh/ton</div>
                   <div>Carbon: 2.0 tons CO2/ton</div>
                 </div>

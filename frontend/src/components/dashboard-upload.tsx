@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Upload, Truck, Image as ImageIcon } from 'lucide-react';
+import { Upload, Truck, Image as ImageIcon, Loader2, Brain, Search } from 'lucide-react';
 
 interface DashboardUploadProps {
   scrapImage: File | null;
@@ -8,6 +8,8 @@ interface DashboardUploadProps {
   truckImage: File | null;
   setTruckImage: (file: File | null) => void;
   onSubmit: () => void;
+  isAnalyzing?: boolean;
+  analysisStage?: string;
 }
 
 export default function DashboardUpload({
@@ -15,7 +17,9 @@ export default function DashboardUpload({
   setScrapImage,
   truckImage,
   setTruckImage,
-  onSubmit
+  onSubmit,
+  isAnalyzing = false,
+  analysisStage = ''
 }: DashboardUploadProps) {
   const [scrapPreview, setScrapPreview] = useState<string | null>(null);
   const [truckPreview, setTruckPreview] = useState<string | null>(null);
@@ -124,17 +128,62 @@ export default function DashboardUpload({
 
       {/* Submit Button */}
       <div className="text-center">
-        <button
-          onClick={onSubmit}
-          disabled={!scrapImage || !truckImage}
-          className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
-        >
-          Analyze Images
-        </button>
-        {(!scrapImage || !truckImage) && (
-          <p className="text-gray-500 text-sm mt-2">
-            Please upload both images to proceed
-          </p>
+        {isAnalyzing ? (
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-xl shadow-lg">
+              <div className="flex items-center justify-center space-x-3 mb-4">
+                <Loader2 className="w-8 h-8 animate-spin" />
+                <Brain className="w-8 h-8 animate-pulse" />
+                <Search className="w-8 h-8 animate-bounce" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">AI Analysis in Progress</h3>
+              <p className="text-blue-100 mb-4">
+                {analysisStage || 'Our advanced algorithms are analyzing your images...'}
+              </p>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span>🔍 Processing Images</span>
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-ping" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-ping" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span>🧠 Analyzing Scrap Type</span>
+                  <div className="w-16 bg-white/20 rounded-full h-2">
+                    <div className="bg-white h-2 rounded-full animate-pulse" style={{width: '70%'}}></div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span>🚛 Reading Truck Plate</span>
+                  <div className="w-16 bg-white/20 rounded-full h-2">
+                    <div className="bg-white h-2 rounded-full animate-pulse" style={{width: '45%'}}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm">
+              This usually takes 10-30 seconds. Please don't refresh the page.
+            </p>
+          </div>
+        ) : (
+          <div>
+            <button
+              onClick={onSubmit}
+              disabled={!scrapImage || !truckImage}
+              className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
+            >
+              <Brain className="w-5 h-5 inline mr-2" />
+              Analyze Images
+            </button>
+            {(!scrapImage || !truckImage) && (
+              <p className="text-gray-500 text-sm mt-2">
+                Please upload both images to proceed
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>
